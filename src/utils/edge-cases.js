@@ -4,63 +4,101 @@
  */
 
 /**
- * Validate and sanitize input configuration
+ * Create validation collector helper for error/warning management
+ * @returns {Object} Collector with addError, addWarning, and getResult methods
  */
-export function validateInput(input) {
+function createValidationCollector() {
   const errors = [];
   const warnings = [];
+  return {
+    addError(message) {
+      errors.push(message);
+    },
+    addWarning(message) {
+      warnings.push(message);
+    },
+    getResult() {
+      return { isValid: errors.length === 0, errors, warnings };
+    },
+  };
+}
 
-  // Check data source
+/**
+ * Validate data source presence
+ * @param {Object} input - Input configuration
+ * @param {Object} collector - Validation collector
+ * @returns {{hasUrl: boolean, hasInline: boolean, hasBase64: boolean}}
+ */
+function validateDataSource(input, collector) {
   const hasUrl = input.dataSourceUrl && input.dataSourceUrl.trim();
   const hasInline = input.dataSourceInline && input.dataSourceInline.trim();
   const hasBase64 = input.dataSourceBase64 && input.dataSourceBase64.trim();
 
   if (!hasUrl && !hasInline && !hasBase64) {
-    errors.push(
+    collector.addError(
       "No data source provided. Please provide dataSourceUrl, dataSourceInline, or dataSourceBase64."
     );
   }
 
   if ([hasUrl, hasInline, hasBase64].filter(Boolean).length > 1) {
-    warnings.push(
+    collector.addWarning(
       "Multiple data sources provided. Only the first valid source will be used (priority: URL > inline > base64)."
     );
   }
 
-  // Validate URL format
-  if (hasUrl) {
-    try {
-      new URL(input.dataSourceUrl);
-    } catch {
-      errors.push(`Invalid URL format: ${input.dataSourceUrl}`);
-    }
+  return { hasUrl, hasInline, hasBase64 };
+}
+
+/**
+ * Validate URL format
+ * @param {string} url - URL to validate
+ * @param {Object} collector - Validation collector
+ */
+function validateUrlFormat(url, collector) {
+  try {
+    new URL(url);
+  } catch {
+    collector.addError(`Invalid URL format: ${url}`);
+  }
+}
+
+/**
+ * Validate schema structure
+ * @param {Array} schemaDefinition - Schema definition array
+ * @param {Object} collector - Validation collector
+ */
+function validateSchemaStructure(schemaDefinition, collector) {
+  if (!Array.isArray(schemaDefinition)) {
+    collector.addError(
+      "schemaDefinition must be an array of column definitions."
+    );
+    return;
   }
 
-  // Validate schema definition
-  if (input.schemaDefinition) {
-    if (!Array.isArray(input.schemaDefinition)) {
-      errors.push("schemaDefinition must be an array of column definitions.");
-    } else {
-      input.schemaDefinition.forEach((col, idx) => {
-        if (!col.name) {
-          errors.push(
-            `Schema column at index ${idx} is missing 'name' property.`
-          );
-        }
-        if (col.type && !VALID_TYPES.includes(col.type)) {
-          warnings.push(
-            `Unknown type '${col.type}' for column '${col.name}'. Will use string validation.`
-          );
-        }
-      });
+  schemaDefinition.forEach((col, idx) => {
+    if (!col.name) {
+      collector.addError(
+        `Schema column at index ${idx} is missing 'name' property.`
+      );
     }
-  }
+    if (col.type && !VALID_TYPES.includes(col.type)) {
+      collector.addWarning(
+        `Unknown type '${col.type}' for column '${col.name}'. Will use string validation.`
+      );
+    }
+  });
+}
 
-  // Validate numeric thresholds
+/**
+ * Validate numeric thresholds
+ * @param {Object} input - Input configuration
+ * @param {Object} collector - Validation collector
+ */
+function validateNumericThresholds(input, collector) {
   if (input.zscoreThreshold !== undefined) {
     const thresh = parseFloat(input.zscoreThreshold);
     if (isNaN(thresh) || thresh < 1 || thresh > 10) {
-      warnings.push(
+      collector.addWarning(
         "zscoreThreshold should be between 1 and 10. Using default value of 3."
       );
     }
@@ -69,13 +107,38 @@ export function validateInput(input) {
   if (input.fuzzySimilarityThreshold !== undefined) {
     const thresh = parseFloat(input.fuzzySimilarityThreshold);
     if (isNaN(thresh) || thresh < 0 || thresh > 1) {
-      warnings.push(
+      collector.addWarning(
         "fuzzySimilarityThreshold should be between 0 and 1. Using default value of 0.85."
       );
     }
   }
+}
 
-  return { isValid: errors.length === 0, errors, warnings };
+/**
+ * Validate and sanitize input configuration
+ * @param {Object} input - Input configuration
+ * @returns {{isValid: boolean, errors: Array, warnings: Array}}
+ */
+export function validateInput(input) {
+  const collector = createValidationCollector();
+
+  // Step 1: Validate data source
+  const { hasUrl } = validateDataSource(input, collector);
+
+  // Step 2: Validate URL format
+  if (hasUrl) {
+    validateUrlFormat(input.dataSourceUrl, collector);
+  }
+
+  // Step 3: Validate schema structure
+  if (input.schemaDefinition) {
+    validateSchemaStructure(input.schemaDefinition, collector);
+  }
+
+  // Step 4: Validate numeric thresholds
+  validateNumericThresholds(input, collector);
+
+  return collector.getResult();
 }
 
 const VALID_TYPES = [

@@ -73,9 +73,232 @@ function applyIgnoredColumns(headers, rows, ignoredColumns) {
   return { headers: filteredHeaders, rows: filteredRows };
 }
 
+// ============================================================================
+// STAGE FUNCTIONS - Modular processing stages for the validation pipeline
+// ============================================================================
+
 /**
- * Main Actor initialization and execution
+ * Parse stage - Load and parse data from source
+ * @param {Object} config - Configuration
+ * @param {Object} timer - Performance timer
+ * @returns {Promise<Object>} Parse result with rows, headers, metadata
  */
+async function parseStage(config, timer) {
+  timer.start("parsing");
+  console.log("📁 Step 1: Parsing data source...");
+  const result = await parseDataSource(config);
+  timer.end("parsing");
+  return result;
+}
+
+/**
+ * Validate stage - Validate data against schema and rules
+ * @param {Array} rows - Data rows
+ * @param {Array} headers - Column headers
+ * @param {Object} config - Configuration
+ * @param {Object} timer - Performance timer
+ * @returns {Promise<Object>} Validation result
+ */
+async function validateStage(rows, headers, config, timer) {
+  timer.start("validation");
+  console.log("🔍 Step 2: Validating data quality...");
+  const result = await validateData(rows, headers, config);
+  timer.end("validation");
+  console.log(`✅ Found ${result.issues.length} issues`);
+  return result;
+}
+
+/**
+ * Profile stage - Profile data columns
+ * @param {Array} rows - Data rows
+ * @param {Array} headers - Column headers
+ * @param {Object} config - Configuration
+ * @returns {Promise<Object>} Profile result
+ */
+async function profileStage(rows, headers, config) {
+  console.log("📈 Step 3: Profiling data...");
+  const result = await profileData(rows, headers, config);
+  console.log(`✅ Profiled ${headers.length} columns`);
+  return result;
+}
+
+/**
+ * Score stage - Calculate quality score
+ * @param {Object} validationResult - Validation result
+ * @param {Object} profileResult - Profile result
+ * @param {number} totalRows - Total row count
+ * @returns {Object} Quality score
+ */
+function scoreStage(validationResult, profileResult, totalRows) {
+  const score = calculateQualityScore(
+    validationResult,
+    profileResult,
+    totalRows
+  );
+  console.log(`🎯 Quality Score: ${score.overall}/100`);
+  return score;
+}
+
+/**
+ * Benford's Law analysis stage
+ * @param {Array} rows - Data rows
+ * @param {Array} headers - Column headers
+ * @param {Object} columnTypes - Column type definitions
+ * @param {Object} config - Configuration
+ * @returns {Object|null} Benford's analysis result
+ */
+function benfordsAnalysisStage(rows, headers, columnTypes, config) {
+  if (!config.enableBenfordsLaw) return null;
+  console.log("📊 Step 5a: Benford's Law analysis...");
+  const result = analyzeBenfordsLaw(rows, headers, columnTypes, config);
+  console.log(
+    `✅ Analyzed ${result.columnsAnalyzed} columns, ${result.violations.length} violations`
+  );
+  return result;
+}
+
+/**
+ * Correlation analysis stage
+ * @param {Array} rows - Data rows
+ * @param {Array} headers - Column headers
+ * @param {Object} columnTypes - Column type definitions
+ * @param {Object} config - Configuration
+ * @returns {Object|null} Correlation analysis result
+ */
+function correlationAnalysisStage(rows, headers, columnTypes, config) {
+  if (!config.enableCorrelationAnalysis) return null;
+  console.log("📊 Step 5b: Correlation analysis...");
+  const result = analyzeCorrelations(rows, headers, columnTypes);
+  console.log(
+    `✅ Found ${result.strongCorrelations.length} strong correlations`
+  );
+  return result;
+}
+
+/**
+ * Pattern detection stage
+ * @param {Array} rows - Data rows
+ * @param {Array} headers - Column headers
+ * @param {Object} columnTypes - Column type definitions
+ * @param {Object} config - Configuration
+ * @returns {Object|null} Pattern detection result
+ */
+function patternDetectionStage(rows, headers, columnTypes, config) {
+  if (!config.enablePatternDetection) return null;
+  console.log("🔬 Step 5c: ML-based pattern detection...");
+  const result = detectPatterns(rows, headers, columnTypes, config);
+  console.log(
+    `✅ Found ${result.summary.patternsFound} patterns, ${result.summary.anomaliesFound} anomalies`
+  );
+  return result;
+}
+
+/**
+ * PII detection stage
+ * @param {Array} rows - Data rows
+ * @param {Array} headers - Column headers
+ * @param {Object} config - Configuration
+ * @returns {Promise<Object|null>} PII detection result
+ */
+async function piiDetectionStage(rows, headers, config) {
+  if (!config.detectPII) return null;
+  console.log("🔒 Step 6: Detecting PII...");
+  const result = await detectPIIInData(rows, headers, config);
+  console.log(`✅ Found ${result.findings.length} PII instances`);
+  return result;
+}
+
+/**
+ * Output generation stage - Build quality report object
+ * @param {Object} context - Processing context with all results
+ * @returns {Object} Quality report
+ */
+function outputGenerationStage(context) {
+  const {
+    rows,
+    headers,
+    validationResult,
+    profileResult,
+    qualityScore,
+    benfordsResult,
+    correlationsResult,
+    patternResult,
+    piiResult,
+    cleanedDataUrl,
+    parseResult,
+    config,
+    processingTime,
+  } = context;
+
+  const summary = {
+    totalRows: rows.length,
+    validRows: rows.length - validationResult.invalidRowCount,
+    invalidRows: validationResult.invalidRowCount,
+    qualityScore: qualityScore.overall,
+    processingTimeMs: processingTime,
+  };
+
+  const dataQuality = {
+    completeness: qualityScore.completeness,
+    uniqueness: qualityScore.uniqueness,
+    consistency: qualityScore.consistency,
+    validity: qualityScore.validity,
+    accuracy: qualityScore.overall,
+  };
+
+  const columnAnalysis = headers.map((header) => {
+    const col = profileResult.columns[header];
+    return {
+      column: header,
+      type: col.detectedType,
+      stats: {
+        nullCount: col.nullCount,
+        uniqueCount: col.uniqueCount,
+        nullPercent: parseFloat(col.nullPercent),
+        duplicates: col.totalCount - col.uniqueCount,
+      },
+      ...(col.numericStats && { numericStats: col.numericStats }),
+      ...(col.stringStats && { stringStats: col.stringStats }),
+    };
+  });
+
+  const duplicateIssues = validationResult.issues.filter(
+    (i) => i.issueType === "duplicate"
+  );
+  const duplicates = {
+    totalDuplicates: duplicateIssues.length,
+    duplicateRows: groupDuplicates(duplicateIssues),
+  };
+
+  const outlierIssues = validationResult.issues.filter(
+    (i) => i.issueType === "outlier"
+  );
+  const outliers = {
+    detected: outlierIssues.length,
+    method: config.detectOutliers,
+    details: outlierIssues.slice(0, 100).map((o) => ({
+      column: o.column,
+      rowNumber: o.rowNumber,
+      value: parseFloat(o.value) || o.value,
+      reason: o.message,
+    })),
+  };
+
+  return {
+    summary,
+    dataQuality,
+    columnAnalysis,
+    duplicates,
+    outliers,
+    benfordsResult,
+    correlationsResult,
+    patternResult,
+    piiResult,
+    cleanedDataUrl,
+    parseResult,
+  };
+}
+
 async function main() {
   await Actor.init();
 

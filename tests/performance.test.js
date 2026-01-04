@@ -41,6 +41,8 @@ describe("Performance Utilities", () => {
       const timer = new PerformanceTimer();
       timer.start("test");
       const start = Date.now();
+      // Intentional busy-wait loop to simulate measurable work for PerformanceTimer testing
+      // This ensures the timer captures a non-zero duration
       while (Date.now() - start < 10) {}
       timer.end("test");
 
