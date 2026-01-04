@@ -1,0 +1,15 @@
+{
+  "actorSpecification": 1,
+  "name": "dataguard",
+  "title": "DataGuard - Data Quality Checker & ETL Validator",
+  "description": "DataGuard: Enterprise-grade data quality validation for CSV, Excel, and JSON files. Features type validation, duplicate detection, outlier analysis, data profiling, quality scoring, auto-remediation, and PII detection. Perfect for ETL pipelines, compliance audits, and data migration.",
+  "version": "1.0.0",
+  "input": "./input_schema.json",
+  "output": "./output_schema.json",
+  "dockerfile": "../Dockerfile",
+  "storages": {
+    "dataset": "./dataset_schema.json",
+    "keyValueStore": "./key_value_store_schema.json"
+  },
+  "categories": ["DEVELOPER_TOOLS", "DATA_PROCESSING", "UTILITIES"]
+}

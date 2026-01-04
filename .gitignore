@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Apify storage (local testing)
+storage/
+apify_storage/
+
+# Build output
+dist/
+build/
+
+# Test coverage
+coverage/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Temp files
+*.tmp
+*.temp
+.cache/
+
+# Archive files
+*.zip
+*.tar.gz
+
+# Test artifacts
+*.test.xlsx
+*.test.csv

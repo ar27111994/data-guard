@@ -1,0 +1,23 @@
+{
+  "name": "dataguard",
+  "version": "1.0.0",
+  "description": "DataGuard - Enterprise-grade data quality validation with anomaly detection, profiling, and auto-remediation.",
+  "type": "module",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node src/main.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --passWithNoTests"
+  },
+  "author": "ar27111994",
+  "license": "ISC",
+  "dependencies": {
+    "apify": "^3.2.6",
+    "exceljs": "^4.4.0",
+    "fastest-levenshtein": "^1.0.16",
+    "papaparse": "^5.4.1",
+    "simple-statistics": "^7.8.7"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

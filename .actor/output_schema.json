@@ -1,0 +1,21 @@
+{
+  "actorOutputSchemaVersion": 1,
+  "title": "Data Quality Validation Results",
+  "properties": {
+    "validationResults": {
+      "type": "string",
+      "title": "Validation Results",
+      "template": "{{links.apiDefaultDatasetUrl}}/items"
+    },
+    "qualityReport": {
+      "type": "string",
+      "title": "Quality Report",
+      "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/QUALITY_REPORT"
+    },
+    "cleanedData": {
+      "type": "string",
+      "title": "Cleaned Data",
+      "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/CLEANED_DATA"
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "actorKeyValueStoreSchemaVersion": 1,
+  "title": "Data Quality Checker Storage",
+  "description": "Stores quality reports, cleaned data, and validation state",
+  "collections": {
+    "reports": {
+      "title": "Quality Reports",
+      "description": "Comprehensive data quality assessment reports",
+      "keyPrefix": "QUALITY_REPORT",
+      "contentTypes": ["application/json"]
+    },
+    "cleanedData": {
+      "title": "Cleaned Data",
+      "description": "Validated and cleaned data exports",
+      "keyPrefix": "CLEANED_DATA",
+      "contentTypes": [
+        "text/csv",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/json"
+      ]
+    },
+    "columnProfiles": {
+      "title": "Column Profiles",
+      "description": "Statistical profiles for each column",
+      "keyPrefix": "COLUMN_PROFILE_",
+      "contentTypes": ["application/json"]
+    },
+    "state": {
+      "title": "Processing State",
+      "description": "Internal state for resumable processing",
+      "key": "STATE",
+      "contentTypes": ["application/json"]
+    }
+  }
+}

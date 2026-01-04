@@ -1,0 +1,333 @@
+{
+  "title": "CSV/Excel Data Quality Checker",
+  "description": "Validate CSV, Excel, and JSON files for data quality issues including type mismatches, duplicates, missing values, and outliers.",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "section_source": {
+      "title": "📁 Data Source",
+      "type": "string",
+      "sectionCaption": "Input Data",
+      "sectionDescription": "Provide the data to validate via URL, inline text, or base64 encoding.",
+      "editor": "hidden"
+    },
+    "dataSourceUrl": {
+      "title": "Data URL",
+      "type": "string",
+      "description": "URL to a CSV, Excel, or JSON file. Supports HTTP/HTTPS and Apify storage URLs.",
+      "example": "https://example.com/data.csv",
+      "editor": "textfield"
+    },
+    "dataSourceInline": {
+      "title": "Inline Data",
+      "type": "string",
+      "description": "Paste CSV, JSON, or JSONL data directly. Use this for quick testing.",
+      "editor": "textarea"
+    },
+    "dataSourceBase64": {
+      "title": "Base64 Encoded Data",
+      "type": "string",
+      "description": "Base64 encoded file content. Useful for binary Excel files from integrations.",
+      "editor": "textarea"
+    },
+    "section_format": {
+      "title": "📊 Format Options",
+      "type": "string",
+      "sectionCaption": "Parsing Configuration",
+      "sectionDescription": "Configure how the input file should be parsed.",
+      "editor": "hidden"
+    },
+    "format": {
+      "title": "File Format",
+      "type": "string",
+      "description": "File format to parse. Use 'auto' for automatic detection based on content/extension.",
+      "default": "auto",
+      "enum": ["auto", "csv", "xlsx", "xls", "json", "jsonl"],
+      "enumTitles": [
+        "Auto-detect",
+        "CSV",
+        "Excel (XLSX)",
+        "Excel (XLS)",
+        "JSON",
+        "JSON Lines"
+      ]
+    },
+    "csvDelimiter": {
+      "title": "CSV Delimiter",
+      "type": "string",
+      "description": "Column separator for CSV files. Use 'auto' for automatic detection.",
+      "default": "auto",
+      "enum": ["auto", ",", ";", "\t", "|"],
+      "enumTitles": [
+        "Auto-detect",
+        "Comma (,)",
+        "Semicolon (;)",
+        "Tab",
+        "Pipe (|)"
+      ]
+    },
+    "encoding": {
+      "title": "Text Encoding",
+      "type": "string",
+      "description": "Character encoding for text files.",
+      "default": "utf-8",
+      "enum": ["utf-8", "latin1", "utf-16", "ascii"],
+      "enumTitles": ["UTF-8", "Latin-1 (ISO-8859-1)", "UTF-16", "ASCII"]
+    },
+    "excelSheet": {
+      "title": "Excel Sheet",
+      "type": "string",
+      "description": "Sheet name or index (0-based) to read from Excel files. Leave empty for first sheet.",
+      "example": "Sheet1",
+      "editor": "textfield"
+    },
+    "hasHeader": {
+      "title": "First Row is Header",
+      "type": "boolean",
+      "description": "Whether the first row contains column names.",
+      "default": true
+    },
+    "section_schema": {
+      "title": "📐 Schema Definition",
+      "type": "string",
+      "sectionCaption": "Column Validation Rules",
+      "sectionDescription": "Define expected column types and constraints. Leave empty for auto-detection.",
+      "editor": "hidden"
+    },
+    "schemaDefinition": {
+      "title": "Column Schema",
+      "type": "array",
+      "description": "Define validation rules for each column. Each item specifies column name, type, and constraints.",
+      "editor": "json",
+      "prefill": [
+        {
+          "name": "id",
+          "type": "integer",
+          "required": true,
+          "unique": true
+        },
+        {
+          "name": "email",
+          "type": "email",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "date"
+        }
+      ]
+    },
+    "autoDetectTypes": {
+      "title": "Auto-Detect Column Types",
+      "type": "boolean",
+      "description": "Automatically infer column types when no schema is provided.",
+      "default": true
+    },
+    "section_validation": {
+      "title": "🔍 Validation Rules",
+      "type": "string",
+      "sectionCaption": "Quality Checks",
+      "sectionDescription": "Configure which validation checks to perform.",
+      "editor": "hidden"
+    },
+    "checkDuplicates": {
+      "title": "Detect Duplicates",
+      "type": "boolean",
+      "description": "Find duplicate rows based on all columns or specified unique columns.",
+      "default": true
+    },
+    "duplicateColumns": {
+      "title": "Duplicate Check Columns",
+      "type": "array",
+      "description": "Columns to use for duplicate detection. Leave empty to use all columns.",
+      "editor": "stringList"
+    },
+    "fuzzyDuplicates": {
+      "title": "Fuzzy Duplicate Matching",
+      "type": "boolean",
+      "description": "Detect near-duplicates using similarity matching (Levenshtein distance).",
+      "default": false
+    },
+    "fuzzySimilarityThreshold": {
+      "title": "Fuzzy Similarity Threshold",
+      "type": "number",
+      "description": "Minimum similarity score (0-1) to consider rows as fuzzy duplicates.",
+      "default": 0.85,
+      "minimum": 0.5,
+      "maximum": 1.0
+    },
+    "checkMissingValues": {
+      "title": "Check Missing Values",
+      "type": "boolean",
+      "description": "Report null, empty, or undefined values.",
+      "default": true
+    },
+    "detectOutliers": {
+      "title": "Outlier Detection Method",
+      "type": "string",
+      "description": "Statistical method for detecting outliers in numeric columns.",
+      "default": "iqr",
+      "enum": ["none", "iqr", "zscore"],
+      "enumTitles": [
+        "Disabled",
+        "IQR (Interquartile Range)",
+        "Z-Score (Standard Deviations)"
+      ]
+    },
+    "zscoreThreshold": {
+      "title": "Z-Score Threshold",
+      "type": "number",
+      "description": "Number of standard deviations to consider as outlier (for Z-Score method).",
+      "default": 3,
+      "minimum": 1,
+      "maximum": 5
+    },
+    "section_output": {
+      "title": "📤 Output Options",
+      "type": "string",
+      "sectionCaption": "Results & Export",
+      "sectionDescription": "Configure output format and what to include in results.",
+      "editor": "hidden"
+    },
+    "generateCleanData": {
+      "title": "Generate Cleaned Data",
+      "type": "boolean",
+      "description": "Create a cleaned version of the data with fixes applied.",
+      "default": false
+    },
+    "cleaningActions": {
+      "title": "Cleaning Actions",
+      "type": "array",
+      "description": "Automatic fixes to apply when generating cleaned data.",
+      "default": ["trim", "removeEmpty"],
+      "editor": "select",
+      "enum": [
+        "trim",
+        "lowercase",
+        "uppercase",
+        "removeEmpty",
+        "removeDuplicates"
+      ],
+      "enumTitles": [
+        "Trim Whitespace",
+        "Convert to Lowercase",
+        "Convert to Uppercase",
+        "Remove Empty Rows",
+        "Remove Duplicate Rows"
+      ]
+    },
+    "sampleSize": {
+      "title": "Sample Size",
+      "type": "integer",
+      "description": "Maximum number of rows to validate. Use 0 for all rows.",
+      "default": 0,
+      "minimum": 0
+    },
+    "maxIssuesPerType": {
+      "title": "Max Issues Per Type",
+      "type": "integer",
+      "description": "Maximum number of issues to report per issue type (for large files).",
+      "default": 100,
+      "minimum": 1,
+      "maximum": 10000
+    },
+    "section_compliance": {
+      "title": "🔒 Compliance & Security",
+      "type": "string",
+      "sectionCaption": "PII Detection",
+      "sectionDescription": "Detect sensitive data for GDPR/CCPA compliance.",
+      "editor": "hidden"
+    },
+    "detectPII": {
+      "title": "Detect PII",
+      "type": "boolean",
+      "description": "Scan for Personally Identifiable Information (emails, phones, SSN patterns).",
+      "default": false
+    },
+    "piiTypes": {
+      "title": "PII Types to Detect",
+      "type": "array",
+      "description": "Types of PII to scan for.",
+      "default": ["email", "phone", "ssn", "creditCard"],
+      "editor": "select",
+      "enum": ["email", "phone", "ssn", "creditCard", "ipAddress"],
+      "enumTitles": [
+        "Email Addresses",
+        "Phone Numbers",
+        "SSN Patterns",
+        "Credit Card Numbers",
+        "IP Addresses"
+      ]
+    },
+    "section_advanced": {
+      "title": "🔬 Advanced Analytics",
+      "type": "string",
+      "sectionCaption": "Premium Features",
+      "sectionDescription": "Enable advanced data quality analysis features.",
+      "editor": "hidden"
+    },
+    "ignoredColumns": {
+      "title": "Ignored Columns",
+      "type": "array",
+      "description": "Columns to skip during validation. Useful for metadata or internal fields.",
+      "editor": "stringList"
+    },
+    "uniqueColumns": {
+      "title": "Unique Columns",
+      "type": "array",
+      "description": "Columns that should contain unique values (enforces uniqueness constraint).",
+      "editor": "stringList"
+    },
+    "enableBenfordsLaw": {
+      "title": "Enable Benford's Law Analysis",
+      "type": "boolean",
+      "description": "Analyze numeric columns for Benford's Law compliance (fraud detection).",
+      "default": false
+    },
+    "enableCorrelationAnalysis": {
+      "title": "Enable Correlation Analysis",
+      "type": "boolean",
+      "description": "Calculate correlations between numeric columns to detect relationships.",
+      "default": false
+    },
+    "failOnFirstError": {
+      "title": "Fail on First Error",
+      "type": "boolean",
+      "description": "Stop validation immediately when the first error is found.",
+      "default": false
+    },
+    "duplicateHandling": {
+      "title": "Duplicate Handling Strategy",
+      "type": "string",
+      "description": "How to handle detected duplicates when generating cleaned data.",
+      "default": "flag",
+      "enum": ["flag", "keepFirst", "keepLast", "merge", "removeAll"],
+      "enumTitles": [
+        "Flag Only (keep all)",
+        "Keep First Occurrence",
+        "Keep Last Occurrence",
+        "Merge Duplicates",
+        "Remove All Duplicates"
+      ]
+    },
+    "enablePatternDetection": {
+      "title": "Enable Pattern Detection",
+      "type": "boolean",
+      "description": "Detect anomalous patterns in data using ML-inspired methods.",
+      "default": false
+    },
+    "generateHTMLReport": {
+      "title": "Generate HTML Report",
+      "type": "boolean",
+      "description": "Create a shareable HTML report with visualization of quality metrics.",
+      "default": false
+    },
+    "enableAuditTrail": {
+      "title": "Enable Audit Trail",
+      "type": "boolean",
+      "description": "Track all validation operations for compliance auditing.",
+      "default": false
+    }
+  },
+  "required": []
+}

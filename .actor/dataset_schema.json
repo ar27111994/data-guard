@@ -1,0 +1,71 @@
+{
+  "actorSpecification": 1,
+  "fields": {
+    "type": "object",
+    "properties": {
+      "rowNumber": { "type": "integer" },
+      "column": { "type": "string" },
+      "value": { "type": "string" },
+      "issueType": { "type": "string" },
+      "severity": { "type": "string" },
+      "message": { "type": "string" },
+      "suggestion": { "type": "string" }
+    }
+  },
+  "views": {
+    "issues": {
+      "title": "Data Quality Issues",
+      "description": "All detected data quality issues",
+      "transformation": {
+        "fields": [
+          "rowNumber",
+          "column",
+          "issueType",
+          "severity",
+          "value",
+          "message",
+          "suggestion"
+        ],
+        "desc": false
+      },
+      "display": {
+        "component": "table",
+        "properties": {
+          "rowNumber": { "label": "Row #", "format": "number" },
+          "column": { "label": "Column", "format": "text" },
+          "issueType": { "label": "Issue Type", "format": "text" },
+          "severity": { "label": "Severity", "format": "text" },
+          "value": { "label": "Value", "format": "text" },
+          "message": { "label": "Message", "format": "text" },
+          "suggestion": { "label": "Suggestion", "format": "text" }
+        }
+      }
+    },
+    "summary": {
+      "title": "Validation Summary",
+      "description": "High-level validation summary",
+      "transformation": {
+        "fields": [
+          "type",
+          "totalRows",
+          "validRows",
+          "invalidRows",
+          "qualityScore",
+          "processingTimeMs"
+        ],
+        "limit": 1
+      },
+      "display": {
+        "component": "table",
+        "properties": {
+          "type": { "label": "Type", "format": "text" },
+          "totalRows": { "label": "Total Rows", "format": "number" },
+          "validRows": { "label": "Valid", "format": "number" },
+          "invalidRows": { "label": "Invalid", "format": "number" },
+          "qualityScore": { "label": "Quality Score", "format": "number" },
+          "processingTimeMs": { "label": "Time (ms)", "format": "number" }
+        }
+      }
+    }
+  }
+}
