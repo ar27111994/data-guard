@@ -566,11 +566,9 @@ async function main() {
     console.log("\n" + "=".repeat(50));
     console.log("🎉 Data Quality Check Complete!");
     console.log("=".repeat(50));
-    console.log(`📊 Total Rows: ${rows.length}`);
-    console.log(
-      `✅ Valid Rows: ${rows.length - validationResult.invalidRowCount}`,
-    );
-    console.log(`❌ Invalid Rows: ${validationResult.invalidRowCount}`);
+    console.log(`📊 Total Rows: ${summary.totalRows}`);
+    console.log(`✅ Valid Rows: ${summary.validRows}`);
+    console.log(`❌ Invalid Rows: ${summary.invalidRows}`);
     console.log(
       `🎯 Quality Score: ${qualityScore.overall}/100 (Grade: ${qualityScore.grade})`,
     );
