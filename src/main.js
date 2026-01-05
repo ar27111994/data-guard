@@ -133,7 +133,7 @@ function scoreStage(validationResult, profileResult, totalRows) {
   const score = calculateQualityScore(
     validationResult,
     profileResult,
-    totalRows
+    totalRows,
   );
   console.log(`🎯 Quality Score: ${score.overall}/100`);
   return score;
@@ -152,7 +152,7 @@ function benfordsAnalysisStage(rows, headers, columnTypes, config) {
   console.log("📊 Step 4a: Benford's Law analysis...");
   const result = analyzeBenfordsLaw(rows, headers, columnTypes, config);
   console.log(
-    `✅ Analyzed ${result.columnsAnalyzed} columns, ${result.violations.length} violations`
+    `✅ Analyzed ${result.columnsAnalyzed} columns, ${result.violations.length} violations`,
   );
   return result;
 }
@@ -170,7 +170,7 @@ function correlationAnalysisStage(rows, headers, columnTypes, config) {
   console.log("📊 Step 4b: Correlation analysis...");
   const result = analyzeCorrelations(rows, headers, columnTypes);
   console.log(
-    `✅ Found ${result.strongCorrelations.length} strong correlations`
+    `✅ Found ${result.strongCorrelations.length} strong correlations`,
   );
   return result;
 }
@@ -188,7 +188,7 @@ function patternDetectionStage(rows, headers, columnTypes, config) {
   console.log("🔬 Step 4c: ML-based pattern detection...");
   const result = detectPatterns(rows, headers, columnTypes, config);
   console.log(
-    `✅ Found ${result.summary.patternsFound} patterns, ${result.summary.anomaliesFound} anomalies`
+    `✅ Found ${result.summary.patternsFound} patterns, ${result.summary.anomaliesFound} anomalies`,
   );
   return result;
 }
@@ -267,7 +267,7 @@ function outputGenerationStage(context) {
   });
 
   const duplicateIssues = validationResult.issues.filter(
-    (i) => i.issueType === "duplicate"
+    (i) => i.issueType === "duplicate",
   );
   const duplicates = {
     totalDuplicates: duplicateIssues.length,
@@ -275,7 +275,7 @@ function outputGenerationStage(context) {
   };
 
   const outlierIssues = validationResult.issues.filter(
-    (i) => i.issueType === "outlier"
+    (i) => i.issueType === "outlier",
   );
   const outliers = {
     detected: outlierIssues.length,
@@ -321,7 +321,7 @@ async function main() {
 
   console.log("🚀 CSV/Excel Data Quality Checker starting...");
   console.log(
-    `📊 Configuration: format=${config.format}, hasHeader=${config.hasHeader}`
+    `📊 Configuration: format=${config.format}, hasHeader=${config.hasHeader}`,
   );
 
   // Validate input configuration
@@ -360,7 +360,7 @@ async function main() {
     const { headers, rows } = applyIgnoredColumns(
       parseResult.headers,
       parseResult.rows,
-      config.ignoredColumns
+      config.ignoredColumns,
     );
 
     console.log(`✅ Parsed ${rows.length} rows with ${headers.length} columns`);
@@ -371,11 +371,11 @@ async function main() {
         input.dataSourceUrl
           ? "url"
           : input.dataSourceInline
-          ? "inline"
-          : "base64",
+            ? "inline"
+            : "base64",
         input.dataSourceUrl,
         rows.length,
-        headers.length
+        headers.length,
       );
       audit.logValidationStart(config);
     }
@@ -388,7 +388,7 @@ async function main() {
       const memCheck = checkMemoryPressure();
       if (memCheck.isHighPressure) {
         console.warn(
-          "⚠️  High memory pressure detected. Consider using sampleSize option."
+          "⚠️  High memory pressure detected. Consider using sampleSize option.",
         );
       }
     }
@@ -409,7 +409,7 @@ async function main() {
       dataToValidate,
       headers,
       config,
-      timer
+      timer,
     );
 
     // Step 3: Profile data (using stage function)
@@ -419,7 +419,7 @@ async function main() {
     const qualityScore = scoreStage(
       validationResult,
       profileResult,
-      rows.length
+      rows.length,
     );
 
     // Step 4a: Benford's Law analysis (using stage function)
@@ -427,7 +427,7 @@ async function main() {
       dataToValidate,
       headers,
       validationResult.columnTypes,
-      config
+      config,
     );
 
     // Step 4b: Correlation analysis (using stage function)
@@ -435,7 +435,7 @@ async function main() {
       dataToValidate,
       headers,
       validationResult.columnTypes,
-      config
+      config,
     );
 
     // Step 4c: Pattern detection (using stage function)
@@ -443,7 +443,7 @@ async function main() {
       dataToValidate,
       headers,
       validationResult.columnTypes,
-      config
+      config,
     );
 
     // Step 5: PII Detection (using stage function)
@@ -455,7 +455,7 @@ async function main() {
       validationResult,
       profileResult,
       qualityScore,
-      config
+      config,
     );
     console.log(`✅ Generated ${recommendations.length} recommendations`);
 
@@ -467,7 +467,7 @@ async function main() {
         dataToValidate,
         headers,
         validationResult,
-        config
+        config,
       );
       console.log(`✅ Cleaned data saved`);
     }
@@ -506,7 +506,7 @@ async function main() {
     // Push issues to dataset (batched for performance)
     const issuesToPush = validationResult.issues.slice(
       0,
-      config.maxIssuesPerType * 10
+      config.maxIssuesPerType * 10,
     );
     if (issuesToPush.length > 0) {
       await Actor.pushData(issuesToPush);
@@ -568,11 +568,11 @@ async function main() {
     console.log("=".repeat(50));
     console.log(`📊 Total Rows: ${rows.length}`);
     console.log(
-      `✅ Valid Rows: ${rows.length - validationResult.invalidRowCount}`
+      `✅ Valid Rows: ${rows.length - validationResult.invalidRowCount}`,
     );
     console.log(`❌ Invalid Rows: ${validationResult.invalidRowCount}`);
     console.log(
-      `🎯 Quality Score: ${qualityScore.overall}/100 (Grade: ${qualityScore.grade})`
+      `🎯 Quality Score: ${qualityScore.overall}/100 (Grade: ${qualityScore.grade})`,
     );
     console.log(`💡 Recommendations: ${recommendations.length}`);
     console.log(`⏱️  Processing Time: ${processingTime}ms`);

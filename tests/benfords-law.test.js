@@ -52,7 +52,7 @@ describe("Benford's Law Analysis", () => {
     test("detects uniform distribution as non-conforming", () => {
       const uniformData = Array.from(
         { length: 1000 },
-        (_, i) => ((i % 9) + 1) * 100
+        (_, i) => ((i % 9) + 1) * 100,
       );
       const result = analyzeBenford(uniformData);
       expect(result.conformsToBenford).toBe(false);

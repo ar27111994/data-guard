@@ -16,7 +16,7 @@ describe("Edge Cases", () => {
         const result = validateInput({});
         expect(result.isValid).toBe(false);
         expect(result.errors.some((e) => e.includes("No data source"))).toBe(
-          true
+          true,
         );
       });
 
@@ -68,7 +68,7 @@ describe("Edge Cases", () => {
           schemaDefinition: [{ type: "integer" }],
         });
         expect(result.errors.some((e) => e.includes("missing 'name'"))).toBe(
-          true
+          true,
         );
       });
 
@@ -78,7 +78,7 @@ describe("Edge Cases", () => {
           schemaDefinition: [{ name: "a", type: "unknown_type" }],
         });
         expect(result.warnings.some((w) => w.includes("Unknown type"))).toBe(
-          true
+          true,
         );
       });
     });
@@ -90,7 +90,7 @@ describe("Edge Cases", () => {
           zscoreThreshold: 100,
         });
         expect(result.warnings.some((w) => w.includes("zscoreThreshold"))).toBe(
-          true
+          true,
         );
       });
 
@@ -100,7 +100,7 @@ describe("Edge Cases", () => {
           fuzzySimilarityThreshold: 2.0,
         });
         expect(
-          result.warnings.some((w) => w.includes("fuzzySimilarityThreshold"))
+          result.warnings.some((w) => w.includes("fuzzySimilarityThreshold")),
         ).toBe(true);
       });
     });
@@ -207,7 +207,7 @@ describe("Edge Cases", () => {
         ["false", "FALSE", "False", "0", "no", "NO", "n", "N"].forEach(
           (val) => {
             expect(safeParseValue(val, "boolean").value).toBe(false);
-          }
+          },
         );
       });
 
@@ -244,7 +244,7 @@ describe("Edge Cases", () => {
   describe("HTML Sanitization", () => {
     test("escapes HTML entities", () => {
       expect(sanitizeForHTML("<script>alert('xss')</script>")).toBe(
-        "&lt;script&gt;alert(&#039;xss&#039;)&lt;/script&gt;"
+        "&lt;script&gt;alert(&#039;xss&#039;)&lt;/script&gt;",
       );
     });
 

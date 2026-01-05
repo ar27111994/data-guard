@@ -43,13 +43,13 @@ function validateDataSource(input, collector) {
 
   if (!hasUrl && !hasInline && !hasBase64) {
     collector.addError(
-      "No data source provided. Please provide dataSourceUrl, dataSourceInline, or dataSourceBase64."
+      "No data source provided. Please provide dataSourceUrl, dataSourceInline, or dataSourceBase64.",
     );
   }
 
   if ([hasUrl, hasInline, hasBase64].filter(Boolean).length > 1) {
     collector.addWarning(
-      "Multiple data sources provided. Only the first valid source will be used (priority: URL > inline > base64)."
+      "Multiple data sources provided. Only the first valid source will be used (priority: URL > inline > base64).",
     );
   }
 
@@ -77,7 +77,7 @@ function validateUrlFormat(url, collector) {
 function validateSchemaStructure(schemaDefinition, collector) {
   if (!Array.isArray(schemaDefinition)) {
     collector.addError(
-      "schemaDefinition must be an array of column definitions."
+      "schemaDefinition must be an array of column definitions.",
     );
     return;
   }
@@ -85,12 +85,12 @@ function validateSchemaStructure(schemaDefinition, collector) {
   schemaDefinition.forEach((col, idx) => {
     if (!col.name) {
       collector.addError(
-        `Schema column at index ${idx} is missing 'name' property.`
+        `Schema column at index ${idx} is missing 'name' property.`,
       );
     }
     if (col.type && !VALID_TYPES.includes(col.type)) {
       collector.addWarning(
-        `Unknown type '${col.type}' for column '${col.name}'. Will use string validation.`
+        `Unknown type '${col.type}' for column '${col.name}'. Will use string validation.`,
       );
     }
   });
@@ -106,7 +106,7 @@ function validateNumericThresholds(input, collector) {
     const thresh = parseFloat(input.zscoreThreshold);
     if (isNaN(thresh) || thresh < 1 || thresh > 10) {
       collector.addWarning(
-        "zscoreThreshold should be between 1 and 10. Using default value of 3."
+        "zscoreThreshold should be between 1 and 10. Using default value of 3.",
       );
     }
   }
@@ -115,7 +115,7 @@ function validateNumericThresholds(input, collector) {
     const thresh = parseFloat(input.fuzzySimilarityThreshold);
     if (isNaN(thresh) || thresh < 0 || thresh > 1) {
       collector.addWarning(
-        "fuzzySimilarityThreshold should be between 0 and 1. Using default value of 0.85."
+        "fuzzySimilarityThreshold should be between 0 and 1. Using default value of 0.85.",
       );
     }
   }
@@ -345,7 +345,7 @@ export function safeStringify(obj, space = 2) {
       }
       return value;
     },
-    space
+    space,
   );
 }
 
@@ -362,7 +362,7 @@ export function checkFileSizeLimits(sizeBytes, limits = {}) {
     return {
       allowed: false,
       reason: `File size (${formatBytes(
-        sizeBytes
+        sizeBytes,
       )}) exceeds maximum allowed (${formatBytes(maxSizeBytes)})`,
     };
   }
@@ -371,7 +371,7 @@ export function checkFileSizeLimits(sizeBytes, limits = {}) {
     return {
       allowed: true,
       warning: `Large file (${formatBytes(
-        sizeBytes
+        sizeBytes,
       )}). Processing may take longer.`,
     };
   }

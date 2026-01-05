@@ -27,7 +27,7 @@ export function streamParseCsv(csvData, config, onRow, onComplete) {
           ...result.errors.map((e) => ({
             row: rowCount,
             ...e,
-          }))
+          })),
         );
       }
 
@@ -50,7 +50,7 @@ export function streamParseCsv(csvData, config, onRow, onComplete) {
         if (memory.heapUsed > 400 * 1024 * 1024) {
           // 400MB threshold
           console.warn(
-            `⚠️ High memory usage at row ${rowCount}. Consider using sampleSize.`
+            `⚠️ High memory usage at row ${rowCount}. Consider using sampleSize.`,
           );
         }
       }
@@ -104,7 +104,7 @@ export class BatchProcessor {
 
     const batchResults = await this.onBatch(
       this.currentBatch,
-      this.processedCount
+      this.processedCount,
     );
     this.processedCount += this.currentBatch.length;
 
@@ -123,7 +123,7 @@ export class BatchProcessor {
       // Trim results if memory is high
       if (this.results.length > 10000) {
         console.warn(
-          "⚠️ Memory pressure detected, trimming results to last 10000"
+          "⚠️ Memory pressure detected, trimming results to last 10000",
         );
         this.results = this.results.slice(-10000);
       }
@@ -161,7 +161,7 @@ export function detectDuplicatesOptimized(rows, keyColumns, options = {}) {
 
   // For large datasets, use hash buckets with sampling
   console.log(
-    `   Large dataset (${rows.length} rows), using optimized duplicate detection`
+    `   Large dataset (${rows.length} rows), using optimized duplicate detection`,
   );
 
   // Create hash index

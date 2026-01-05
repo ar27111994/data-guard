@@ -40,7 +40,7 @@ function validateDataTypes(rows, headers, config) {
     config.schemaDefinition.forEach((col, idx) => {
       if (!col.name) {
         warnings.push(
-          `Schema column at index ${idx} missing 'name' property, skipped`
+          `Schema column at index ${idx} missing 'name' property, skipped`,
         );
         return;
       }
@@ -72,7 +72,7 @@ function validateTypeConformance(rows, headers, columnTypes, config) {
     typeErrors: typeIssues.filter((i) => i.issueType === "type-mismatch")
       .length,
     missingValues: typeIssues.filter(
-      (i) => i.issueType === "null" || i.issueType === "missing"
+      (i) => i.issueType === "null" || i.issueType === "missing",
     ).length,
   };
 }
@@ -90,7 +90,7 @@ function validateConstraintsStage(rows, headers, columnTypes, config) {
     rows,
     headers,
     columnTypes,
-    config
+    config,
   );
   return { issues: constraintIssues, count: constraintIssues.length };
 }
@@ -107,11 +107,11 @@ function detectDuplicatesStage(rows, headers, config) {
 
   if (config.duplicateColumns && config.duplicateColumns.length > 0) {
     const missingCols = config.duplicateColumns.filter(
-      (c) => !headers.includes(c)
+      (c) => !headers.includes(c),
     );
     if (missingCols.length > 0) {
       warnings.push(
-        `Duplicate check columns not found: ${missingCols.join(", ")}`
+        `Duplicate check columns not found: ${missingCols.join(", ")}`,
       );
     }
   }
@@ -231,7 +231,7 @@ export function validateData(rows, headers, config) {
         rows,
         headers,
         columnTypes,
-        config
+        config,
       );
       issues.push(...typeResult.issues);
       issueBreakdown.typeErrors = typeResult.typeErrors;
@@ -246,7 +246,7 @@ export function validateData(rows, headers, config) {
         rows,
         headers,
         columnTypes,
-        config
+        config,
       );
       issues.push(...constraintResult.issues);
       issueBreakdown.constraintViolations = constraintResult.count;
@@ -273,7 +273,7 @@ export function validateData(rows, headers, config) {
           rows,
           headers,
           columnTypes,
-          config
+          config,
         );
         issues.push(...outlierResult.issues);
         issueBreakdown.outliers = outlierResult.count;
@@ -288,7 +288,7 @@ export function validateData(rows, headers, config) {
         const uniqueIssues = validateUniqueColumns(
           rows,
           config.uniqueColumns,
-          headers
+          headers,
         );
         issues.push(...uniqueIssues);
         issueBreakdown.constraintViolations += uniqueIssues.length;
@@ -312,7 +312,7 @@ export function validateData(rows, headers, config) {
 
     // Calculate invalid row count
     const invalidRows = new Set(
-      truncatedIssues.map((i) => i.rowNumber).filter(Boolean)
+      truncatedIssues.map((i) => i.rowNumber).filter(Boolean),
     );
 
     return {

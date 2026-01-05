@@ -179,7 +179,7 @@ export function analyzeCorrelations(rows, headers, columnTypes) {
   // Step 3: Classify correlations
   const { strongCorrelations, perfectCorrelations } = classifyCorrelations(
     matrix,
-    numericColumns
+    numericColumns,
   );
 
   return {

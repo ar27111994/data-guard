@@ -72,7 +72,7 @@ export function detectDuplicates(rows, headers, config) {
       signatures,
       columnsToCheck,
       fuzzySimilarityThreshold,
-      maxIssues - issues.length
+      maxIssues - issues.length,
     );
     issues.push(...fuzzyIssues);
   }
@@ -87,7 +87,7 @@ function detectFuzzyDuplicates(
   signatures,
   columnsToCheck,
   threshold,
-  maxIssues
+  maxIssues,
 ) {
   const issues = [];
   const reported = new Set();
@@ -121,7 +121,7 @@ function detectFuzzyDuplicates(
             issueType: "fuzzy-duplicate",
             severity: "info",
             message: `Similar to row ${i + 1} (${(similarity * 100).toFixed(
-              1
+              1,
             )}% match)`,
             suggestion: "Review if these rows should be merged or deduplicated",
           });

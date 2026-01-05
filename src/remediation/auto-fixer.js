@@ -17,7 +17,7 @@ export async function generateCleanedData(
   rows,
   headers,
   validationResult,
-  config
+  config,
 ) {
   const { cleaningActions = [] } = config;
   let cleanedRows = [...rows];
@@ -127,7 +127,7 @@ export function imputeMissingValues(
   rows,
   column,
   strategy,
-  constantValue = null
+  constantValue = null,
 ) {
   const nonNullValues = rows
     .map((r) => r[column])

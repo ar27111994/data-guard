@@ -171,7 +171,7 @@ function estimateMemoryUsage(value) {
   if (typeof value === "object") {
     return Object.values(value).reduce(
       (sum, v) => sum + estimateMemoryUsage(v),
-      0
+      0,
     );
   }
   return 8;

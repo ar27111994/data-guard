@@ -70,7 +70,7 @@ export const Errors = {
         suggestion:
           "Add a data source using one of the available input methods",
         recoverable: true,
-      }
+      },
     ),
 
   invalidUrl: (url) =>
@@ -92,7 +92,7 @@ export const Errors = {
         suggestion: "Verify the base64 encoding is correct and complete",
         details: { originalError: error?.message },
         recoverable: true,
-      }
+      },
     ),
 
   emptyData: () =>
@@ -103,7 +103,7 @@ export const Errors = {
         code: "E1004_EMPTY_DATA",
         suggestion: "Verify the file contains data rows beyond the header",
         recoverable: true,
-      }
+      },
     ),
 
   // Parsing Errors
@@ -119,7 +119,7 @@ export const Errors = {
           "Check for malformed CSV syntax, unescaped quotes, or encoding issues",
         details: { row, originalError: error?.message },
         recoverable: false,
-      }
+      },
     ),
 
   excelParseError: (error) =>
@@ -132,7 +132,7 @@ export const Errors = {
           "Ensure the file is a valid .xlsx or .xls format and not password-protected",
         details: { originalError: error?.message },
         recoverable: false,
-      }
+      },
     ),
 
   jsonParseError: (error) =>
@@ -174,12 +174,12 @@ export const Errors = {
           status === 404
             ? "Verify the URL exists and is publicly accessible"
             : status === 403
-            ? "The resource requires authentication or is access-restricted"
-            : "Check network connectivity and try again",
+              ? "The resource requires authentication or is access-restricted"
+              : "Check network connectivity and try again",
         details: { url: url.substring(0, 100), status, statusText },
         retryable: status >= 500,
         recoverable: false,
-      }
+      },
     ),
 
   timeout: (url, timeoutMs) =>
@@ -213,7 +213,7 @@ export const Errors = {
         suggestion: "Review the schemaDefinition format in the input",
         details: { column, issue },
         recoverable: true,
-      }
+      },
     ),
 
   columnNotFound: (column, availableColumns) =>
@@ -238,7 +238,7 @@ export const Errors = {
           "Use the sampleSize option to process a subset of data, or split the file into smaller parts",
         details: { usedMB, limitMB },
         recoverable: false,
-      }
+      },
     ),
 
   fileTooLarge: (sizeMB, maxSizeMB) =>
@@ -251,7 +251,7 @@ export const Errors = {
           "Split the file into smaller parts or use sampleSize option",
         details: { sizeMB, maxSizeMB },
         recoverable: true,
-      }
+      },
     ),
 
   // Internal Errors

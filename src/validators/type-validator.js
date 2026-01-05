@@ -55,7 +55,7 @@ export const TYPE_VALIDATORS = {
   uuid: (v) => {
     if (v === null || v === undefined || v === "") return true;
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-      String(v)
+      String(v),
     );
   },
 
@@ -138,7 +138,7 @@ export function validateTypes(rows, headers, columnTypes, config) {
             severity: "error",
             message: `Value '${String(value).substring(
               0,
-              50
+              50,
             )}' is not a valid ${colDef.type}`,
             suggestion: getTypeSuggestion(colDef.type, value),
           });
@@ -219,7 +219,7 @@ function inferType(values) {
       type: "boolean",
       test: (v) =>
         ["true", "false", "yes", "no", "0", "1"].includes(
-          String(v).toLowerCase()
+          String(v).toLowerCase(),
         ),
     },
     {

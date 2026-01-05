@@ -164,13 +164,13 @@ const response = await fetch(
       detectPII: true,
       generateCleanData: true,
     }),
-  }
+  },
 );
 
 const run = await response.json();
 
 // Poll for results
 const results = await fetch(
-  `https://api.apify.com/v2/actor-runs/${run.data.id}/dataset/items`
+  `https://api.apify.com/v2/actor-runs/${run.data.id}/dataset/items`,
 );
 ```

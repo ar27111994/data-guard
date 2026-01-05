@@ -64,7 +64,7 @@ async function uploadToS3(data, bucket, path, credentials) {
   // For full SDK integration, user would need to install aws-sdk
   console.log(`S3 upload configured for s3://${bucket}/${path}`);
   console.log(
-    "To enable direct S3 upload, provide a presignedUrl in credentials"
+    "To enable direct S3 upload, provide a presignedUrl in credentials",
   );
   console.log("Or install aws-sdk and provide accessKeyId + secretAccessKey");
 
@@ -102,7 +102,7 @@ async function uploadToGCS(data, bucket, path, credentials) {
 
   console.log(`GCS upload configured for gs://${bucket}/${path}`);
   console.log(
-    "To enable direct GCS upload, provide a signedUrl in credentials"
+    "To enable direct GCS upload, provide a signedUrl in credentials",
   );
 
   return {

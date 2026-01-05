@@ -84,7 +84,7 @@ describe("Error Handler", () => {
       const error = Errors.fetchFailed(
         "https://example.com",
         503,
-        "Service Unavailable"
+        "Service Unavailable",
       );
       expect(error.retryable).toBe(true);
     });
@@ -186,7 +186,7 @@ describe("Error Handler", () => {
           }
           return "success";
         },
-        { maxRetries: 3, baseDelayMs: 10 }
+        { maxRetries: 3, baseDelayMs: 10 },
       );
 
       expect(result).toBe("success");
@@ -202,8 +202,8 @@ describe("Error Handler", () => {
             attempts++;
             throw new Error("Always fails");
           },
-          { maxRetries: 3, baseDelayMs: 10 }
-        )
+          { maxRetries: 3, baseDelayMs: 10 },
+        ),
       ).rejects.toThrow("Always fails");
 
       expect(attempts).toBe(3);
@@ -218,8 +218,8 @@ describe("Error Handler", () => {
             attempts++;
             throw new DataQualityError("Not retryable", { retryable: false });
           },
-          { maxRetries: 3, baseDelayMs: 10 }
-        )
+          { maxRetries: 3, baseDelayMs: 10 },
+        ),
       ).rejects.toThrow();
 
       expect(attempts).toBe(1);

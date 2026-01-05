@@ -11,7 +11,7 @@
  */
 export function generateNumericHistogram(values, bins = 10) {
   const numericValues = values.filter(
-    (v) => typeof v === "number" && !isNaN(v) && isFinite(v)
+    (v) => typeof v === "number" && !isNaN(v) && isFinite(v),
   );
 
   if (numericValues.length === 0) {
@@ -53,7 +53,7 @@ export function generateNumericHistogram(values, bins = 10) {
   // Calculate percentages
   histogram.forEach((bin) => {
     bin.percent = parseFloat(
-      ((bin.count / numericValues.length) * 100).toFixed(2)
+      ((bin.count / numericValues.length) * 100).toFixed(2),
     );
   });
 
@@ -74,7 +74,7 @@ export function generateNumericHistogram(values, bins = 10) {
  */
 export function generateCategoricalDistribution(values, topN = 20) {
   const nonNullValues = values.filter(
-    (v) => v !== null && v !== undefined && v !== ""
+    (v) => v !== null && v !== undefined && v !== "",
   );
 
   if (nonNullValues.length === 0) {
@@ -108,7 +108,7 @@ export function generateCategoricalDistribution(values, topN = 20) {
       value: `[${uniqueCount - topN} others]`,
       count: othersCount,
       percent: parseFloat(
-        ((othersCount / nonNullValues.length) * 100).toFixed(2)
+        ((othersCount / nonNullValues.length) * 100).toFixed(2),
       ),
     });
   }
@@ -128,7 +128,7 @@ export function generateCategoricalDistribution(values, topN = 20) {
  */
 export function analyzeCardinality(values) {
   const nonNullValues = values.filter(
-    (v) => v !== null && v !== undefined && v !== ""
+    (v) => v !== null && v !== undefined && v !== "",
   );
   const uniqueValues = new Set(nonNullValues.map(String));
 

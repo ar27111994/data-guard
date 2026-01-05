@@ -114,7 +114,7 @@ function calculateQualityScore(validation, rowCount) {
 
   // Weighted average
   const overall = Math.round(
-    completeness * 0.3 + validity * 0.3 + uniqueness * 0.2 + consistency * 0.2
+    completeness * 0.3 + validity * 0.3 + uniqueness * 0.2 + consistency * 0.2,
   );
 
   return {
