@@ -102,10 +102,13 @@ async function parseStage(config, timer) {
 async function validateStage(rows, headers, config, timer) {
   timer.start("validation");
   console.log("🔍 Step 2: Validating data quality...");
-  const result = await validateData(rows, headers, config);
-  timer.end("validation");
-  console.log(`✅ Found ${result.issues.length} issues`);
-  return result;
+  try {
+    const result = await validateData(rows, headers, config);
+    console.log(`✅ Found ${result.issues.length} issues`);
+    return result;
+  } finally {
+    timer.end("validation");
+  }
 }
 
 /**

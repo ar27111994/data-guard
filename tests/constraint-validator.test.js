@@ -1,3 +1,8 @@
+import {
+  regexCache,
+  validatePattern as realValidatePattern,
+} from "../src/validators/constraint-validator.js";
+
 /**
  * Constraint Validator Tests
  * Tests min/max, pattern, enum, and other constraints
@@ -167,21 +172,19 @@ function validateValueWithType(value, constraints) {
       };
 }
 
-// Pattern cache for test implementation
-const regexCache = new Map();
-
 function validatePattern(value, pattern) {
-  if (value === "" || value === null) return null;
-  try {
-    if (!regexCache.has(pattern)) {
-      regexCache.set(pattern, new RegExp(pattern));
-    }
-    const regex = regexCache.get(pattern);
-    return regex.test(value) ? null : { error: "pattern-mismatch" };
-  } catch (e) {
-    // Invalid regex pattern - return null (no validation)
-    return null;
-  }
+  const aggregator = {
+    addIssue: (row, col, val, type) => {
+      // Mock aggregator logic to match test expectations
+    },
+    // We need to capture if an issue was added
+    issues: [],
+  };
+  aggregator.addIssue = (row, col, val, type) =>
+    aggregator.issues.push({ type });
+
+  realValidatePattern(value, "col", 0, { pattern }, aggregator);
+  return aggregator.issues.length > 0 ? { error: "pattern-mismatch" } : null;
 }
 
 function validateEnum(value, allowed) {

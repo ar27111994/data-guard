@@ -50,6 +50,16 @@ function validateDataTypes(rows, headers, config) {
       }
       columnTypes[col.name] = col;
     });
+
+    // If schema is partial, auto-detect remaining columns (schema wins on conflicts)
+    if (config.autoDetectTypes !== false) {
+      const detected = detectColumnTypes(rows, headers);
+      for (const header of headers) {
+        if (!columnTypes[header] && detected[header]) {
+          columnTypes[header] = detected[header];
+        }
+      }
+    }
   } else if (config.autoDetectTypes !== false) {
     columnTypes = detectColumnTypes(rows, headers);
   }

@@ -5,7 +5,7 @@
  */
 
 /** Cache for compiled regex patterns (keyed by pattern string only) */
-const regexCache = new Map();
+export const regexCache = new Map();
 
 /** Maximum number of cached regex patterns to prevent unbounded growth */
 const MAX_REGEX_CACHE_SIZE = 100;
@@ -157,7 +157,13 @@ function validateLength(value, column, rowIndex, constraints, aggregator) {
  * @param {Object} constraints - Constraint definitions
  * @param {Object} aggregator - Issue aggregator
  */
-function validatePattern(value, column, rowIndex, constraints, aggregator) {
+export function validatePattern(
+  value,
+  column,
+  rowIndex,
+  constraints,
+  aggregator
+) {
   if (!constraints.pattern) return;
 
   const regex = getCompiledRegex(constraints.pattern, column);

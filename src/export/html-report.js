@@ -338,21 +338,22 @@ function buildStyles(qualityScore) {
  * @returns {Promise<string>} Key name where report is saved
  */
 export async function generateHTMLReport(qualityReport, _config) {
+  const report = qualityReport ?? {};
   const {
-    summary,
-    dataQuality,
-    columnAnalysis,
-    issues,
-    recommendations,
-    metadata,
-  } = qualityReport;
+    summary: summaryRaw = {},
+    dataQuality = {},
+    columnAnalysis = [],
+    issues = [],
+    recommendations = [],
+    metadata = {},
+  } = report;
 
   const timestamp = sanitizeForHTML(
     metadata?.validatedAt || new Date().toISOString()
   );
   // Clamp processing time to sensible range (0 to 1 hour)
   const processingTime = clamp(
-    safeNumber(summary.processingTimeMs, 0),
+    safeNumber(summaryRaw.processingTimeMs, 0),
     0,
     MAX_PROCESSING_TIME_MS
   );

@@ -81,30 +81,25 @@ function buildCorrelationMatrix(rows, numericColumns) {
 
   for (let i = 0; i < numericColumns.length; i++) {
     const col1 = numericColumns[i];
-    matrix[col1] = {};
+    matrix[col1][col1] = 1.0;
 
-    for (let j = 0; j < numericColumns.length; j++) {
+    for (let j = i + 1; j < numericColumns.length; j++) {
       const col2 = numericColumns[j];
 
-      if (i === j) {
-        matrix[col1][col2] = 1.0;
-        continue;
-      }
-
       const pairs = getPairedValues(rows, col1, col2);
+      let value = null;
 
       // Require minimum pairs for meaningful correlation
-      if (pairs.length < MIN_PAIRS_FOR_CORRELATION) {
-        matrix[col1][col2] = null;
-        continue;
+      if (pairs.length >= MIN_PAIRS_FOR_CORRELATION) {
+        const x = pairs.map((p) => p[0]);
+        const y = pairs.map((p) => p[1]);
+        const correlation = pearsonCorrelation(x, y);
+        value =
+          correlation !== null ? parseFloat(correlation.toFixed(4)) : null;
       }
 
-      const x = pairs.map((p) => p[0]);
-      const y = pairs.map((p) => p[1]);
-      const correlation = pearsonCorrelation(x, y);
-
-      matrix[col1][col2] =
-        correlation !== null ? parseFloat(correlation.toFixed(4)) : null;
+      matrix[col1][col2] = value;
+      matrix[col2][col1] = value;
     }
   }
 
@@ -179,7 +174,7 @@ export function analyzeCorrelations(rows, headers, columnTypes) {
   // Step 3: Classify correlations
   const { strongCorrelations, perfectCorrelations } = classifyCorrelations(
     matrix,
-    numericColumns,
+    numericColumns
   );
 
   return {
