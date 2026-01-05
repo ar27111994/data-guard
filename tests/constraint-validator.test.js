@@ -36,6 +36,11 @@ describe("Constraint Validator", () => {
   });
 
   describe("Pattern Constraints", () => {
+    // Clear regex cache before each test to prevent pollution
+    beforeEach(() => {
+      regexCache.clear();
+    });
+
     test("validates regex pattern", () => {
       expect(validatePattern("ABC123", "^[A-Z]{3}\\d{3}$")).toBeNull();
       expect(validatePattern("abc123", "^[A-Z]{3}\\d{3}$")).toBeDefined();
@@ -114,40 +119,50 @@ describe("Constraint Validator", () => {
   });
 });
 
-// Self-contained validation functions
-function validateValue(value, constraints) {
+// Shared helper: computes range violation descriptor
+function computeRangeViolation(value, constraints) {
   if (constraints === undefined) return null;
   if (value === "" || value === null || value === undefined) return null;
 
   const num = Number(value);
 
   if (constraints.min !== undefined && num < constraints.min) {
-    return { error: "below-min", value, min: constraints.min };
+    return { kind: "min", value, limit: constraints.min };
   }
 
   if (constraints.max !== undefined && num > constraints.max) {
-    return { error: "above-max", value, max: constraints.max };
+    return { kind: "max", value, limit: constraints.max };
   }
 
   return null;
 }
 
+// Self-contained validation functions
+function validateValue(value, constraints) {
+  const violation = computeRangeViolation(value, constraints);
+  if (!violation) return null;
+
+  return violation.kind === "min"
+    ? { error: "below-min", value: violation.value, min: violation.limit }
+    : { error: "above-max", value: violation.value, max: violation.limit };
+}
+
 // Helper to return issue with type (matches new constraint-validator types)
 function validateValueWithType(value, constraints) {
-  if (constraints === undefined) return null;
-  if (value === "" || value === null || value === undefined) return null;
+  const violation = computeRangeViolation(value, constraints);
+  if (!violation) return null;
 
-  const num = Number(value);
-
-  if (constraints.min !== undefined && num < constraints.min) {
-    return { type: "range-min-violation", value, min: constraints.min };
-  }
-
-  if (constraints.max !== undefined && num > constraints.max) {
-    return { type: "range-max-violation", value, max: constraints.max };
-  }
-
-  return null;
+  return violation.kind === "min"
+    ? {
+        type: "range-min-violation",
+        value: violation.value,
+        min: violation.limit,
+      }
+    : {
+        type: "range-max-violation",
+        value: violation.value,
+        max: violation.limit,
+      };
 }
 
 // Pattern cache for test implementation

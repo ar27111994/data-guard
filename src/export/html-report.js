@@ -399,9 +399,16 @@ export async function generateHTMLReport(qualityReport, config) {
 </body>
 </html>`.trim();
 
-  await Actor.setValue("QUALITY_REPORT_HTML", html, {
-    contentType: "text/html",
-  });
+  try {
+    await Actor.setValue("QUALITY_REPORT_HTML", html, {
+      contentType: "text/html",
+    });
+  } catch (error) {
+    console.error("Failed to save QUALITY_REPORT_HTML:", error.message);
+    throw new Error(
+      `Failed to save HTML report to key-value store: ${error.message}`
+    );
+  }
 
   return "QUALITY_REPORT_HTML";
 }
