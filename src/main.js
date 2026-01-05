@@ -329,11 +329,8 @@ async function main() {
   }
 
   try {
-    // Step 1: Parse input data source
-    timer.start("parsing");
-    console.log("📁 Step 1: Parsing data source...");
-    const parseResult = await parseDataSource(config);
-    timer.end("parsing");
+    // Step 1: Parse input data source (using stage function)
+    const parseResult = await parseStage(config, timer);
 
     // Handle empty data gracefully
     const dataCheck = handleEmptyData(parseResult.rows, parseResult.headers);
@@ -400,81 +397,50 @@ async function main() {
       console.log(`   Sampling first ${config.sampleSize} rows`);
     }
 
-    // Step 2: Validate data against schema
-    timer.start("validation");
-    console.log("🔍 Step 2: Validating data quality...");
-    const validationResult = await validateData(
+    // Step 2: Validate data against schema (using stage function)
+    const validationResult = validateStage(
       dataToValidate,
       headers,
-      config
+      config,
+      timer
     );
-    timer.end("validation");
-    console.log(`✅ Found ${validationResult.issues.length} issues`);
 
-    // Step 3: Profile data
-    console.log("📈 Step 3: Profiling data...");
-    const profileResult = await profileData(dataToValidate, headers, config);
-    console.log(`✅ Profiled ${headers.length} columns`);
+    // Step 3: Profile data (using stage function)
+    const profileResult = await profileStage(dataToValidate, headers, config);
 
-    // Step 4: Calculate quality score
-    const qualityScore = calculateQualityScore(
+    // Step 4: Calculate quality score (using stage function)
+    const qualityScore = scoreStage(
       validationResult,
       profileResult,
       rows.length
     );
-    console.log(`🎯 Quality Score: ${qualityScore.overall}/100`);
 
-    // Step 5: Benford's Law analysis (if enabled)
-    let benfordsResult = null;
-    if (config.enableBenfordsLaw) {
-      console.log("📊 Step 5a: Benford's Law analysis...");
-      benfordsResult = analyzeBenfordsLaw(
-        dataToValidate,
-        headers,
-        validationResult.columnTypes,
-        config
-      );
-      console.log(
-        `✅ Analyzed ${benfordsResult.columnsAnalyzed} columns, ${benfordsResult.violations.length} violations`
-      );
-    }
+    // Step 5: Benford's Law analysis (using stage function)
+    const benfordsResult = benfordsAnalysisStage(
+      dataToValidate,
+      headers,
+      validationResult.columnTypes,
+      config
+    );
 
-    // Step 6: Correlation analysis (if enabled)
-    let correlationsResult = null;
-    if (config.enableCorrelationAnalysis) {
-      console.log("📊 Step 5b: Correlation analysis...");
-      correlationsResult = analyzeCorrelations(
-        dataToValidate,
-        headers,
-        validationResult.columnTypes
-      );
-      console.log(
-        `✅ Found ${correlationsResult.strongCorrelations.length} strong correlations`
-      );
-    }
+    // Step 6: Correlation analysis (using stage function)
+    const correlationsResult = correlationAnalysisStage(
+      dataToValidate,
+      headers,
+      validationResult.columnTypes,
+      config
+    );
 
-    // Step 5c: Pattern detection (if enabled)
-    let patternResult = null;
-    if (config.enablePatternDetection) {
-      console.log("🔬 Step 5c: ML-based pattern detection...");
-      patternResult = detectPatterns(
-        dataToValidate,
-        headers,
-        validationResult.columnTypes,
-        config
-      );
-      console.log(
-        `✅ Found ${patternResult.summary.patternsFound} patterns, ${patternResult.summary.anomaliesFound} anomalies`
-      );
-    }
+    // Step 5c: Pattern detection (using stage function)
+    const patternResult = patternDetectionStage(
+      dataToValidate,
+      headers,
+      validationResult.columnTypes,
+      config
+    );
 
-    // Step 7: PII Detection (if enabled)
-    let piiResult = null;
-    if (config.detectPII) {
-      console.log("🔒 Step 6: Detecting PII...");
-      piiResult = await detectPIIInData(dataToValidate, headers, config);
-      console.log(`✅ Found ${piiResult.findings.length} PII instances`);
-    }
+    // Step 7: PII Detection (using stage function)
+    const piiResult = await piiDetectionStage(dataToValidate, headers, config);
 
     // Step 8: Generate recommendations
     console.log("💡 Step 7: Generating recommendations...");

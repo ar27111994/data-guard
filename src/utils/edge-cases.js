@@ -30,9 +30,13 @@ function createValidationCollector() {
  * @returns {{hasUrl: boolean, hasInline: boolean, hasBase64: boolean}}
  */
 function validateDataSource(input, collector) {
-  const hasUrl = input.dataSourceUrl && input.dataSourceUrl.trim();
-  const hasInline = input.dataSourceInline && input.dataSourceInline.trim();
-  const hasBase64 = input.dataSourceBase64 && input.dataSourceBase64.trim();
+  // Check for string type before calling .trim() to handle non-string truthy values
+  const hasUrl =
+    typeof input.dataSourceUrl === "string" && input.dataSourceUrl.trim();
+  const hasInline =
+    typeof input.dataSourceInline === "string" && input.dataSourceInline.trim();
+  const hasBase64 =
+    typeof input.dataSourceBase64 === "string" && input.dataSourceBase64.trim();
 
   if (!hasUrl && !hasInline && !hasBase64) {
     collector.addError(

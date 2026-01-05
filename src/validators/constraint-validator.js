@@ -1,8 +1,36 @@
 /**
  * Constraint Validator
  * Validates field constraints: required, min, max, pattern, allowedValues
- * With modular validator functions and issue aggregation
+ * With modular validator functions, issue aggregation, and regex caching
  */
+
+/** Cache for compiled regex patterns */
+const regexCache = new Map();
+
+/**
+ * Get or compile a regex pattern with caching
+ * @param {string} pattern - Regex pattern string
+ * @param {string} column - Column name for error logging
+ * @returns {RegExp|null} Compiled regex or null if invalid
+ */
+function getCompiledRegex(pattern, column) {
+  const cacheKey = `${column}:${pattern}`;
+
+  if (regexCache.has(cacheKey)) {
+    const cached = regexCache.get(cacheKey);
+    return cached === "invalid" ? null : cached;
+  }
+
+  try {
+    const regex = new RegExp(pattern);
+    regexCache.set(cacheKey, regex);
+    return regex;
+  } catch (e) {
+    console.warn(`Invalid regex pattern for ${column}: ${pattern}`);
+    regexCache.set(cacheKey, "invalid");
+    return null;
+  }
+}
 
 /**
  * Create issue aggregator factory for reusable issue collection with counting
@@ -55,7 +83,7 @@ function validateMinMax(value, column, rowIndex, constraints, aggregator) {
       rowIndex,
       column,
       value,
-      "range-violation",
+      "range-min-violation",
       `Value ${numValue} is below minimum ${constraints.min}`,
       `Ensure value is at least ${constraints.min}`
     );
@@ -66,7 +94,7 @@ function validateMinMax(value, column, rowIndex, constraints, aggregator) {
       rowIndex,
       column,
       value,
-      "range-violation",
+      "range-max-violation",
       `Value ${numValue} exceeds maximum ${constraints.max}`,
       `Ensure value is at most ${constraints.max}`
     );
@@ -92,7 +120,7 @@ function validateLength(value, column, rowIndex, constraints, aggregator) {
       rowIndex,
       column,
       value,
-      "length-violation",
+      "length-min-violation",
       `Value length ${strValue.length} is below minimum ${constraints.minLength}`,
       `Provide at least ${constraints.minLength} characters`
     );
@@ -106,7 +134,7 @@ function validateLength(value, column, rowIndex, constraints, aggregator) {
       rowIndex,
       column,
       value,
-      "length-violation",
+      "length-max-violation",
       `Value length ${strValue.length} exceeds maximum ${constraints.maxLength}`,
       `Limit to ${constraints.maxLength} characters`
     );
@@ -114,7 +142,7 @@ function validateLength(value, column, rowIndex, constraints, aggregator) {
 }
 
 /**
- * Validate regex pattern constraint
+ * Validate regex pattern constraint with caching
  * @param {*} value - Value to validate
  * @param {string} column - Column name
  * @param {number} rowIndex - Row index
@@ -124,20 +152,18 @@ function validateLength(value, column, rowIndex, constraints, aggregator) {
 function validatePattern(value, column, rowIndex, constraints, aggregator) {
   if (!constraints.pattern) return;
 
-  try {
-    const regex = new RegExp(constraints.pattern);
-    if (!regex.test(String(value))) {
-      aggregator.addIssue(
-        rowIndex,
-        column,
-        value,
-        "pattern-violation",
-        `Value does not match required pattern: ${constraints.pattern}`,
-        "Ensure value matches the expected format"
-      );
-    }
-  } catch (e) {
-    console.warn(`Invalid regex pattern for ${column}: ${constraints.pattern}`);
+  const regex = getCompiledRegex(constraints.pattern, column);
+  if (!regex) return; // Invalid pattern already logged once
+
+  if (!regex.test(String(value))) {
+    aggregator.addIssue(
+      rowIndex,
+      column,
+      value,
+      "pattern-violation",
+      `Value does not match required pattern: ${constraints.pattern}`,
+      "Ensure value matches the expected format"
+    );
   }
 }
 

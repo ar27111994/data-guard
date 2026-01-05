@@ -43,7 +43,7 @@ async function fetchRawData(sourceType, config) {
     case "inline":
       return dataSourceInline;
     default:
-      throw Errors.noDataSource();
+      throw Errors.internal(new Error(`Unsupported sourceType: ${sourceType}`));
   }
 }
 
@@ -338,9 +338,11 @@ function assessCsvErrors(errors, dataLength) {
   const criticalErrors = errors.filter(
     (e) => e.type === "Quotes" || e.type === "FieldMismatch"
   );
+  // If no data was parsed and there are critical errors, treat as fatal
+  // Use Math.max(1, ...) to avoid division issues with very small datasets
   const hasFatalErrors =
     criticalErrors.length > 0 &&
-    (dataLength === 0 || criticalErrors.length > dataLength * 0.5);
+    (dataLength === 0 || criticalErrors.length > Math.max(1, dataLength * 0.5));
   return { criticalErrors, hasFatalErrors };
 }
 
@@ -358,10 +360,9 @@ function extractCsvHeaders(result, config) {
   if (hasHeader !== false) {
     headers = result.meta.fields || [];
   } else {
+    // Papa.parse always returns arrays for header: false mode
     const firstRow = result.data[0] || [];
-    headers = Array.isArray(firstRow)
-      ? firstRow.map((_, i) => `column_${i + 1}`)
-      : Object.keys(firstRow);
+    headers = firstRow.map((_, i) => `column_${i + 1}`);
   }
 
   // Validate headers - fallback extraction

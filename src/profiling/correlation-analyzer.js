@@ -4,6 +4,9 @@
  * With modular helper functions for extraction, matrix building, and classification
  */
 
+/** Minimum number of paired values required for correlation calculation */
+const MIN_PAIRS_FOR_CORRELATION = 10;
+
 /**
  * Calculate Pearson correlation coefficient between two arrays
  * @param {Array<number>} x - First array
@@ -36,26 +39,16 @@ function pearsonCorrelation(x, y) {
 }
 
 /**
- * Extract numeric columns from data
- * @param {Array} rows - Data rows
+ * Extract numeric column names from headers based on column types
  * @param {Array} headers - Column headers
  * @param {Object} columnTypes - Column type definitions
- * @returns {{numericColumns: Array, columnData: Object}}
+ * @returns {Array} Array of numeric column names
  */
-function extractNumericColumns(rows, headers, columnTypes) {
-  const numericColumns = headers.filter((header) => {
+function extractNumericColumns(headers, columnTypes) {
+  return headers.filter((header) => {
     const colDef = columnTypes[header];
     return colDef && ["number", "integer"].includes(colDef.type);
   });
-
-  const columnData = {};
-  numericColumns.forEach((col) => {
-    columnData[col] = rows
-      .map((row) => parseFloat(row[col]))
-      .filter((v) => !isNaN(v));
-  });
-
-  return { numericColumns, columnData };
 }
 
 /**
@@ -100,7 +93,8 @@ function buildCorrelationMatrix(rows, numericColumns) {
 
       const pairs = getPairedValues(rows, col1, col2);
 
-      if (pairs.length < 10) {
+      // Require minimum pairs for meaningful correlation
+      if (pairs.length < MIN_PAIRS_FOR_CORRELATION) {
         matrix[col1][col2] = null;
         continue;
       }
@@ -168,8 +162,8 @@ function classifyCorrelations(matrix, numericColumns) {
  * @returns {Object} Correlation analysis results
  */
 export function analyzeCorrelations(rows, headers, columnTypes) {
-  // Step 1: Extract numeric columns
-  const { numericColumns } = extractNumericColumns(rows, headers, columnTypes);
+  // Step 1: Extract numeric columns (no columnData needed)
+  const numericColumns = extractNumericColumns(headers, columnTypes);
 
   if (numericColumns.length < 2) {
     return {

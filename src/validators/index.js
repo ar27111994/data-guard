@@ -51,9 +51,6 @@ function validateDataTypes(rows, headers, config) {
     });
   } else if (config.autoDetectTypes !== false) {
     columnTypes = detectColumnTypes(rows, headers);
-    console.log(
-      `   Auto-detected types for ${Object.keys(columnTypes).length} columns`
-    );
   }
 
   return { columnTypes, warnings };
@@ -188,7 +185,7 @@ function validateUniqueColumns(rows, uniqueColumns, headers) {
  * @param {Object} config - Validation configuration
  * @returns {Object} Validation results
  */
-export async function validateData(rows, headers, config) {
+export function validateData(rows, headers, config) {
   const issues = [];
   const issueBreakdown = {
     typeErrors: 0,
@@ -300,7 +297,9 @@ export async function validateData(rows, headers, config) {
     }
 
     // Stage 8: Enforce issue limits
-    const maxIssues = (config.maxIssuesPerType || 100) * 10;
+    // Multiplier is configurable via config.issueLimitMultiplier (default: 10)
+    const multiplier = config.issueLimitMultiplier || 10;
+    const maxIssues = (config.maxIssuesPerType || 100) * multiplier;
     let truncatedIssues = issues;
     if (issues.length > maxIssues) {
       truncatedIssues = issues.slice(0, maxIssues);

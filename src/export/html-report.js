@@ -1,9 +1,48 @@
 /**
  * HTML Report Generator
  * Generates shareable HTML validation reports
- * With modular section builder functions
+ * With modular section builder functions and XSS prevention
  */
 import { Actor } from "apify";
+
+/**
+ * Escape HTML special characters to prevent XSS
+ * @param {*} value - Value to escape
+ * @returns {string} HTML-escaped string
+ */
+function escapeHtml(value) {
+  if (value === null || value === undefined) return "";
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/**
+ * Safely get a numeric value with fallback
+ * @param {*} value - Value to validate
+ * @param {number} fallback - Fallback value
+ * @returns {number} Safe numeric value
+ */
+function safeNumber(value, fallback = 0) {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+  return fallback;
+}
+
+/**
+ * Clamp a number to a range
+ * @param {number} value - Value to clamp
+ * @param {number} min - Minimum value
+ * @param {number} max - Maximum value
+ * @returns {number} Clamped value
+ */
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
 
 /**
  * Build summary cards HTML section
@@ -11,25 +50,30 @@ import { Actor } from "apify";
  * @returns {string} HTML string
  */
 function buildSummaryCards(summary) {
+  const score = safeNumber(summary.qualityScore, 0);
+  const totalRows = safeNumber(summary.totalRows, 0);
+  const validRows = safeNumber(summary.validRows, 0);
+  const invalidRows = safeNumber(summary.invalidRows, 0);
+
   return `
     <div class="grid">
       <div class="card">
         <div class="score-ring">
-          <div class="inner">${summary.qualityScore}</div>
+          <div class="inner">${Math.round(score)}</div>
         </div>
         <h3 style="text-align:center">Quality Score</h3>
       </div>
       <div class="card success">
         <h3>Total Rows</h3>
-        <div class="value">${summary.totalRows?.toLocaleString() || 0}</div>
+        <div class="value">${totalRows.toLocaleString()}</div>
       </div>
       <div class="card success">
         <h3>Valid Rows</h3>
-        <div class="value">${summary.validRows?.toLocaleString() || 0}</div>
+        <div class="value">${validRows.toLocaleString()}</div>
       </div>
-      <div class="card ${summary.invalidRows > 0 ? "error" : "success"}">
+      <div class="card ${invalidRows > 0 ? "error" : "success"}">
         <h3>Invalid Rows</h3>
-        <div class="value">${summary.invalidRows?.toLocaleString() || 0}</div>
+        <div class="value">${invalidRows.toLocaleString()}</div>
       </div>
     </div>`;
 }
@@ -40,25 +84,30 @@ function buildSummaryCards(summary) {
  * @returns {string} HTML string
  */
 function buildMetricsSection(dataQuality) {
+  const completeness = safeNumber(dataQuality?.completeness, 0);
+  const validity = safeNumber(dataQuality?.validity, 0);
+  const uniqueness = safeNumber(dataQuality?.uniqueness, 0);
+  const consistency = safeNumber(dataQuality?.consistency, 0);
+
   return `
     <div class="card" style="margin-bottom: 2rem;">
       <h2 style="margin-bottom: 1rem;">📊 Data Quality Metrics</h2>
       <div class="metrics-bar">
         <div class="metric">
           <label>Completeness</label>
-          <span>${dataQuality?.completeness || 0}%</span>
+          <span>${Math.round(completeness)}%</span>
         </div>
         <div class="metric">
           <label>Validity</label>
-          <span>${dataQuality?.validity || 0}%</span>
+          <span>${Math.round(validity)}%</span>
         </div>
         <div class="metric">
           <label>Uniqueness</label>
-          <span>${dataQuality?.uniqueness || 0}%</span>
+          <span>${Math.round(uniqueness)}%</span>
         </div>
         <div class="metric">
           <label>Consistency</label>
-          <span>${dataQuality?.consistency || 0}%</span>
+          <span>${Math.round(consistency)}%</span>
         </div>
       </div>
     </div>`;
@@ -76,10 +125,10 @@ function buildColumnAnalysisTable(columnAnalysis) {
     .map(
       (col) => `
       <tr>
-        <td><strong>${col.column}</strong></td>
-        <td>${col.type}</td>
-        <td>${col.stats?.nullPercent || 0}%</td>
-        <td>${col.stats?.uniqueCount || 0}</td>
+        <td><strong>${escapeHtml(col.column)}</strong></td>
+        <td>${escapeHtml(col.type)}</td>
+        <td>${safeNumber(col.stats?.nullPercent, 0)}%</td>
+        <td>${safeNumber(col.stats?.uniqueCount, 0)}</td>
       </tr>`
     )
     .join("");
@@ -111,31 +160,40 @@ function buildIssuesTable(issues) {
 
   const rows = issues
     .slice(0, 50)
-    .map(
-      (issue) => `
+    .map((issue) => {
+      const rowNum = escapeHtml(issue.rowNumber);
+      const column = escapeHtml(issue.column);
+      const message = escapeHtml(issue.message || issue.issueType);
+      const severity = escapeHtml(issue.severity);
+      const badgeClass =
+        issue.severity === "error"
+          ? "error"
+          : issue.severity === "warning"
+          ? "warning"
+          : "info";
+
+      return `
       <tr>
-        <td>${issue.rowNumber}</td>
-        <td>${issue.column}</td>
-        <td>${issue.message || issue.issueType}</td>
-        <td><span class="badge badge-${
-          issue.severity === "error"
-            ? "error"
-            : issue.severity === "warning"
-            ? "warning"
-            : "info"
-        }">${issue.severity}</span></td>
-      </tr>`
-    )
+        <td>${rowNum}</td>
+        <td>${column}</td>
+        <td>${message}</td>
+        <td><span class="badge badge-${badgeClass}">${severity}</span></td>
+      </tr>`;
+    })
     .join("");
 
   const truncationNote =
     issues.length > 50
-      ? `<p style="margin-top: 1rem; color: var(--muted);">Showing first 50 of ${issues.length} issues</p>`
+      ? `<p style="margin-top: 1rem; color: var(--muted);">Showing first 50 of ${escapeHtml(
+          issues.length
+        )} issues</p>`
       : "";
 
   return `
     <div class="card" style="margin-bottom: 2rem;">
-      <h2 style="margin-bottom: 1rem;">⚠️ Issues Found (${issues.length})</h2>
+      <h2 style="margin-bottom: 1rem;">⚠️ Issues Found (${escapeHtml(
+        issues.length
+      )})</h2>
       <table>
         <thead>
           <tr>
@@ -159,14 +217,16 @@ function buildIssuesTable(issues) {
 function buildRecommendationsSection(recommendations) {
   if (!recommendations || recommendations.length === 0) return "";
 
-  const items = (Array.isArray(recommendations) ? recommendations : [])
+  const items = recommendations
     .slice(0, 10)
-    .map(
-      (rec) => `
+    .map((rec) => {
+      const text =
+        typeof rec === "string" ? rec : rec.description || rec.title || "";
+      return `
       <li style="padding: 0.75rem; background: #f0f9ff; border-radius: 8px; margin-bottom: 0.5rem;">
-        ${typeof rec === "string" ? rec : rec.description || rec.title}
-      </li>`
-    )
+        ${escapeHtml(text)}
+      </li>`;
+    })
     .join("");
 
   return `
@@ -182,6 +242,9 @@ function buildRecommendationsSection(recommendations) {
  * @returns {string} CSS string
  */
 function buildStyles(qualityScore) {
+  // Coerce to finite number, default to 0, clamp to 0-100
+  const score = clamp(safeNumber(qualityScore, 0), 0, 100);
+
   return `
     :root {
       --primary: #2563eb;
@@ -226,7 +289,7 @@ function buildStyles(qualityScore) {
     .score-ring {
       width: 120px; height: 120px;
       border-radius: 50%;
-      background: conic-gradient(var(--primary) ${qualityScore}%, #e2e8f0 0);
+      background: conic-gradient(var(--primary) ${score}%, #e2e8f0 0);
       display: flex; align-items: center; justify-content: center;
       margin: 0 auto 1rem;
     }
@@ -278,7 +341,10 @@ export async function generateHTMLReport(qualityReport, config) {
     metadata,
   } = qualityReport;
 
-  const timestamp = metadata?.validatedAt || new Date().toISOString();
+  const timestamp = escapeHtml(
+    metadata?.validatedAt || new Date().toISOString()
+  );
+  const processingTime = safeNumber(summary.processingTimeMs, 0);
 
   const html = `
 <!DOCTYPE html>
@@ -304,7 +370,7 @@ export async function generateHTMLReport(qualityReport, config) {
 
     <footer>
       <p>Generated by DataGuard • Apify Actor</p>
-      <p>Processing time: ${summary.processingTimeMs}ms</p>
+      <p>Processing time: ${Math.round(processingTime)}ms</p>
     </footer>
   </div>
 </body>
