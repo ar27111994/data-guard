@@ -22,6 +22,7 @@ function escapeHtml(value) {
 
 /**
  * Safely get a numeric value with fallback
+ * Accepts numbers and numeric strings
  * @param {*} value - Value to validate
  * @param {number} fallback - Fallback value
  * @returns {number} Safe numeric value
@@ -30,8 +31,20 @@ function safeNumber(value, fallback = 0) {
   if (typeof value === "number" && Number.isFinite(value)) {
     return value;
   }
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (trimmed !== "") {
+      const parsed = Number(trimmed);
+      if (Number.isFinite(parsed)) {
+        return parsed;
+      }
+    }
+  }
   return fallback;
 }
+
+/** Maximum processing time to display (1 hour in ms) */
+const MAX_PROCESSING_TIME_MS = 3_600_000;
 
 /**
  * Clamp a number to a range
@@ -39,8 +52,12 @@ function safeNumber(value, fallback = 0) {
  * @param {number} min - Minimum value
  * @param {number} max - Maximum value
  * @returns {number} Clamped value
+ * @throws {RangeError} If min > max
  */
 function clamp(value, min, max) {
+  if (min > max) {
+    throw new RangeError(`clamp: min (${min}) must be <= max (${max})`);
+  }
   return Math.min(Math.max(value, min), max);
 }
 
@@ -59,21 +76,21 @@ function buildSummaryCards(summary) {
     <div class="grid">
       <div class="card">
         <div class="score-ring">
-          <div class="inner">${Math.round(score)}</div>
+          <div class="inner">${escapeHtml(Math.round(score))}</div>
         </div>
         <h3 style="text-align:center">Quality Score</h3>
       </div>
       <div class="card success">
         <h3>Total Rows</h3>
-        <div class="value">${totalRows.toLocaleString()}</div>
+        <div class="value">${escapeHtml(totalRows.toLocaleString())}</div>
       </div>
       <div class="card success">
         <h3>Valid Rows</h3>
-        <div class="value">${validRows.toLocaleString()}</div>
+        <div class="value">${escapeHtml(validRows.toLocaleString())}</div>
       </div>
       <div class="card ${invalidRows > 0 ? "error" : "success"}">
         <h3>Invalid Rows</h3>
-        <div class="value">${invalidRows.toLocaleString()}</div>
+        <div class="value">${escapeHtml(invalidRows.toLocaleString())}</div>
       </div>
     </div>`;
 }
@@ -215,7 +232,8 @@ function buildIssuesTable(issues) {
  * @returns {string} HTML string
  */
 function buildRecommendationsSection(recommendations) {
-  if (!recommendations || recommendations.length === 0) return "";
+  if (!Array.isArray(recommendations) || recommendations.length === 0)
+    return "";
 
   const items = recommendations
     .slice(0, 10)
@@ -344,7 +362,12 @@ export async function generateHTMLReport(qualityReport, config) {
   const timestamp = escapeHtml(
     metadata?.validatedAt || new Date().toISOString()
   );
-  const processingTime = safeNumber(summary.processingTimeMs, 0);
+  // Clamp processing time to sensible range (0 to 1 hour)
+  const processingTime = clamp(
+    safeNumber(summary.processingTimeMs, 0),
+    0,
+    MAX_PROCESSING_TIME_MS
+  );
 
   const html = `
 <!DOCTYPE html>

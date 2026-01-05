@@ -398,7 +398,7 @@ async function main() {
     }
 
     // Step 2: Validate data against schema (using stage function)
-    const validationResult = validateStage(
+    const validationResult = await validateStage(
       dataToValidate,
       headers,
       config,

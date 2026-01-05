@@ -4,30 +4,38 @@
  * With modular validator functions, issue aggregation, and regex caching
  */
 
-/** Cache for compiled regex patterns */
+/** Cache for compiled regex patterns (keyed by pattern string only) */
 const regexCache = new Map();
 
+/** Maximum number of cached regex patterns to prevent unbounded growth */
+const MAX_REGEX_CACHE_SIZE = 100;
+
 /**
- * Get or compile a regex pattern with caching
+ * Get or compile a regex pattern with caching and bounded eviction
  * @param {string} pattern - Regex pattern string
  * @param {string} column - Column name for error logging
  * @returns {RegExp|null} Compiled regex or null if invalid
  */
 function getCompiledRegex(pattern, column) {
-  const cacheKey = `${column}:${pattern}`;
-
-  if (regexCache.has(cacheKey)) {
-    const cached = regexCache.get(cacheKey);
+  // Use pattern-only as cache key so identical patterns share one compiled RegExp
+  if (regexCache.has(pattern)) {
+    const cached = regexCache.get(pattern);
     return cached === "invalid" ? null : cached;
+  }
+
+  // Evict oldest entry if cache is full (simple LRU-like eviction)
+  if (regexCache.size >= MAX_REGEX_CACHE_SIZE) {
+    const oldestKey = regexCache.keys().next().value;
+    regexCache.delete(oldestKey);
   }
 
   try {
     const regex = new RegExp(pattern);
-    regexCache.set(cacheKey, regex);
+    regexCache.set(pattern, regex);
     return regex;
   } catch (e) {
     console.warn(`Invalid regex pattern for ${column}: ${pattern}`);
-    regexCache.set(cacheKey, "invalid");
+    regexCache.set(pattern, "invalid");
     return null;
   }
 }
