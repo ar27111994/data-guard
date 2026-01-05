@@ -185,6 +185,7 @@ function validateUniqueColumns(rows, uniqueColumns, headers) {
  * @param {Object} config - Validation configuration
  * @returns {Object} Validation results
  */
+// Intentionally async for compatibility and future awaiting (e.g. DB lookups)
 export async function validateData(rows, headers, config) {
   const issues = [];
   const issueBreakdown = {

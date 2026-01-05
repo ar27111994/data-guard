@@ -97,7 +97,7 @@ async function parseStage(config, timer) {
  * @param {Array} headers - Column headers
  * @param {Object} config - Configuration
  * @param {Object} timer - Performance timer
- * @returns {Object} Validation result
+ * @returns {Promise<Object>} Validation result
  */
 async function validateStage(rows, headers, config, timer) {
   timer.start("validation");
