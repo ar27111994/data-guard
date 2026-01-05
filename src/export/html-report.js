@@ -56,7 +56,7 @@ const MAX_PROCESSING_TIME_MS = 3_600_000;
  */
 function clamp(value, min, max) {
   if (min > max) {
-    throw new RangeError(`clamp: min (${min}) must be <= max (${max})`);
+    throw new RangeError(`min (${min}) must be <= max (${max})`);
   }
   return Math.min(Math.max(value, min), max);
 }

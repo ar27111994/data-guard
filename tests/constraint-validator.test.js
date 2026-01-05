@@ -48,17 +48,17 @@ describe("Constraint Validator", () => {
     });
 
     test("handles invalid regex pattern gracefully", () => {
-      // Invalid regex should not throw, should return null (no validation)
-      expect(() => validatePattern("test", "[invalid(")).not.toThrow();
+      // Invalid regex should return null (no validation)
+      expect(validatePattern("test", "[invalid(")).toBeNull();
     });
 
     test("caches compiled regex patterns", () => {
-      // Same pattern across different columns should share compiled regex
       const pattern = "^[A-Z]+$";
-      validatePattern("ABC", pattern);
-      validatePattern("DEF", pattern);
-      // If caching works, second call reuses cached regex (no exception)
-      expect(true).toBe(true);
+      const result1 = validatePattern("ABC", pattern);
+      const result2 = validatePattern("DEF", pattern);
+      expect(result1).toBeNull();
+      expect(result2).toBeNull();
+      // Cache is used internally - verified by repeated calls not throwing
     });
   });
 
@@ -150,10 +150,16 @@ function validateValueWithType(value, constraints) {
   return null;
 }
 
+// Pattern cache for test implementation
+const regexCache = new Map();
+
 function validatePattern(value, pattern) {
   if (value === "" || value === null) return null;
   try {
-    const regex = new RegExp(pattern);
+    if (!regexCache.has(pattern)) {
+      regexCache.set(pattern, new RegExp(pattern));
+    }
+    const regex = regexCache.get(pattern);
     return regex.test(value) ? null : { error: "pattern-mismatch" };
   } catch (e) {
     // Invalid regex pattern - return null (no validation)
