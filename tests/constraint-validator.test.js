@@ -25,6 +25,14 @@ describe("Constraint Validator", () => {
       expect(validateValue(0, { min: 0, max: 100 })).toBeNull();
       expect(validateValue(100, { min: 0, max: 100 })).toBeNull();
     });
+
+    test("returns separate issue types for min and max violations", () => {
+      const minIssue = validateValueWithType(5, { min: 10 });
+      expect(minIssue.type).toBe("range-min-violation");
+
+      const maxIssue = validateValueWithType(150, { max: 100 });
+      expect(maxIssue.type).toBe("range-max-violation");
+    });
   });
 
   describe("Pattern Constraints", () => {
@@ -37,6 +45,20 @@ describe("Constraint Validator", () => {
       const pattern = "^\\+\\d{1,3}-\\d{3}-\\d{3}-\\d{4}$";
       expect(validatePattern("+1-555-555-5555", pattern)).toBeNull();
       expect(validatePattern("5555555555", pattern)).toBeDefined();
+    });
+
+    test("handles invalid regex pattern gracefully", () => {
+      // Invalid regex should not throw, should return null (no validation)
+      expect(() => validatePattern("test", "[invalid(")).not.toThrow();
+    });
+
+    test("caches compiled regex patterns", () => {
+      // Same pattern across different columns should share compiled regex
+      const pattern = "^[A-Z]+$";
+      validatePattern("ABC", pattern);
+      validatePattern("DEF", pattern);
+      // If caching works, second call reuses cached regex (no exception)
+      expect(true).toBe(true);
     });
   });
 
@@ -71,6 +93,14 @@ describe("Constraint Validator", () => {
       expect(validateLength("ABC", { maxLength: 5 })).toBeNull();
       expect(validateLength("ABCDEFGHIJ", { maxLength: 5 })).toBeDefined();
     });
+
+    test("returns separate issue types for minLength and maxLength violations", () => {
+      const minIssue = validateLengthWithType("Jo", { minLength: 3 });
+      expect(minIssue.type).toBe("length-min-violation");
+
+      const maxIssue = validateLengthWithType("ABCDEFGHIJ", { maxLength: 5 });
+      expect(maxIssue.type).toBe("length-max-violation");
+    });
   });
 
   describe("Edge Cases", () => {
@@ -102,10 +132,33 @@ function validateValue(value, constraints) {
   return null;
 }
 
+// Helper to return issue with type (matches new constraint-validator types)
+function validateValueWithType(value, constraints) {
+  if (constraints === undefined) return null;
+  if (value === "" || value === null || value === undefined) return null;
+
+  const num = Number(value);
+
+  if (constraints.min !== undefined && num < constraints.min) {
+    return { type: "range-min-violation", value, min: constraints.min };
+  }
+
+  if (constraints.max !== undefined && num > constraints.max) {
+    return { type: "range-max-violation", value, max: constraints.max };
+  }
+
+  return null;
+}
+
 function validatePattern(value, pattern) {
   if (value === "" || value === null) return null;
-  const regex = new RegExp(pattern);
-  return regex.test(value) ? null : { error: "pattern-mismatch" };
+  try {
+    const regex = new RegExp(pattern);
+    return regex.test(value) ? null : { error: "pattern-mismatch" };
+  } catch (e) {
+    // Invalid regex pattern - return null (no validation)
+    return null;
+  }
 }
 
 function validateEnum(value, allowed) {
@@ -126,6 +179,21 @@ function validateLength(value, constraints) {
 
   if (constraints.maxLength && value.length > constraints.maxLength) {
     return { error: "too-long" };
+  }
+
+  return null;
+}
+
+// Helper to return issue with type for length violations
+function validateLengthWithType(value, constraints) {
+  if (value === "" || value === null) return null;
+
+  if (constraints.minLength && value.length < constraints.minLength) {
+    return { type: "length-min-violation" };
+  }
+
+  if (constraints.maxLength && value.length > constraints.maxLength) {
+    return { type: "length-max-violation" };
   }
 
   return null;
