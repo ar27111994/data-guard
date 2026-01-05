@@ -415,7 +415,7 @@ async function main() {
       rows.length
     );
 
-    // Step 5: Benford's Law analysis (using stage function)
+    // Step 4a: Benford's Law analysis (using stage function)
     const benfordsResult = benfordsAnalysisStage(
       dataToValidate,
       headers,
@@ -423,7 +423,7 @@ async function main() {
       config
     );
 
-    // Step 6: Correlation analysis (using stage function)
+    // Step 4b: Correlation analysis (using stage function)
     const correlationsResult = correlationAnalysisStage(
       dataToValidate,
       headers,
@@ -431,7 +431,7 @@ async function main() {
       config
     );
 
-    // Step 5c: Pattern detection (using stage function)
+    // Step 4c: Pattern detection (using stage function)
     const patternResult = patternDetectionStage(
       dataToValidate,
       headers,
@@ -439,11 +439,11 @@ async function main() {
       config
     );
 
-    // Step 7: PII Detection (using stage function)
+    // Step 5: PII Detection (using stage function)
     const piiResult = await piiDetectionStage(dataToValidate, headers, config);
 
-    // Step 8: Generate recommendations
-    console.log("💡 Step 7: Generating recommendations...");
+    // Step 6: Generate recommendations
+    console.log("💡 Step 6: Generating recommendations...");
     const recommendations = generateRecommendations(
       validationResult,
       profileResult,
@@ -452,10 +452,10 @@ async function main() {
     );
     console.log(`✅ Generated ${recommendations.length} recommendations`);
 
-    // Step 9: Generate cleaned data (if enabled)
+    // Step 7: Generate cleaned data (if enabled)
     let cleanedDataUrl = null;
     if (config.generateCleanData) {
-      console.log("🧹 Step 8: Generating cleaned data...");
+      console.log("🧹 Step 7: Generating cleaned data...");
       cleanedDataUrl = await generateCleanedData(
         dataToValidate,
         headers,
