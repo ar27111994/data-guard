@@ -56,7 +56,7 @@ describe("Excel Parser", () => {
 
       if (config.hasHeader !== false && rowNumber === 1) {
         headers = rowData.map((h, i) =>
-          h != null ? String(h) : `column_${i + 1}`
+          h != null ? String(h) : `column_${i + 1}`,
         );
       } else {
         const obj = {};

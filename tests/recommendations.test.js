@@ -14,8 +14,8 @@ describe("Recommendations Engine", () => {
       const recommendations = generateRecommendations({ issues });
       expect(
         recommendations.some(
-          (r) => r.category === "type" || r.description.includes("type")
-        )
+          (r) => r.category === "type" || r.description.includes("type"),
+        ),
       ).toBe(true);
     });
   });
@@ -31,8 +31,8 @@ describe("Recommendations Engine", () => {
       expect(
         recommendations.some(
           (r) =>
-            r.description.includes("missing") || r.description.includes("null")
-        )
+            r.description.includes("missing") || r.description.includes("null"),
+        ),
       ).toBe(true);
     });
   });
@@ -46,7 +46,7 @@ describe("Recommendations Engine", () => {
 
       const recommendations = generateRecommendations({ issues });
       expect(
-        recommendations.some((r) => r.description.includes("duplicate"))
+        recommendations.some((r) => r.description.includes("duplicate")),
       ).toBe(true);
     });
   });
@@ -57,7 +57,7 @@ describe("Recommendations Engine", () => {
 
       const recommendations = generateRecommendations({ issues });
       expect(
-        recommendations.some((r) => r.description.includes("outlier"))
+        recommendations.some((r) => r.description.includes("outlier")),
       ).toBe(true);
     });
   });
@@ -71,7 +71,7 @@ describe("Recommendations Engine", () => {
 
       const recommendations = generateRecommendations({ issues });
       expect(recommendations[0].priority).toBeGreaterThanOrEqual(
-        recommendations[recommendations.length - 1].priority
+        recommendations[recommendations.length - 1].priority,
       );
     });
   });

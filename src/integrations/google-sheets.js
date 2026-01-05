@@ -94,11 +94,11 @@ export async function fetchGoogleSheetsData(url, options = {}) {
     // Check for common errors
     if (response.status === 401 || response.status === 403) {
       throw new Error(
-        "Google Sheets access denied. Ensure the sheet is publicly accessible or provide an API key."
+        "Google Sheets access denied. Ensure the sheet is publicly accessible or provide an API key.",
       );
     }
     throw new Error(
-      `Failed to fetch Google Sheets: ${response.status} ${response.statusText}`
+      `Failed to fetch Google Sheets: ${response.status} ${response.statusText}`,
     );
   }
 

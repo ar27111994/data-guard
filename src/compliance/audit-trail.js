@@ -124,10 +124,10 @@ class AuditTrail {
     return {
       actionCounts,
       dataModifications: this.entries.filter(
-        (e) => e.action === "DATA_MODIFIED"
+        (e) => e.action === "DATA_MODIFIED",
       ).length,
       piiDetected: this.entries.some(
-        (e) => e.action === "PII_DETECTED" && e.findingsCount > 0
+        (e) => e.action === "PII_DETECTED" && e.findingsCount > 0,
       ),
     };
   }

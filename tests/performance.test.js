@@ -40,8 +40,19 @@ describe("Performance Utilities", () => {
     test("tracks execution time", () => {
       const timer = new PerformanceTimer();
       timer.start("test");
+
+      // Deterministic CPU-bound computation instead of busy-wait
+      // Performs math operations to simulate real work
       const start = Date.now();
-      while (Date.now() - start < 10) {}
+      let result = 0;
+      while (Date.now() - start < 10) {
+        for (let i = 0; i < 1000; i++) {
+          result += Math.sqrt(i) * Math.sin(i);
+        }
+      }
+      // Prevent optimization from eliminating the loop
+      if (result === Infinity) console.log(result);
+
       timer.end("test");
 
       const times = timer.getTimings();
@@ -160,7 +171,7 @@ function estimateMemoryUsage(value) {
   if (typeof value === "object") {
     return Object.values(value).reduce(
       (sum, v) => sum + estimateMemoryUsage(v),
-      0
+      0,
     );
   }
   return 8;

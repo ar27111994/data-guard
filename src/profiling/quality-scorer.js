@@ -13,7 +13,7 @@
 export function calculateQualityScore(
   validationResult,
   profileResult,
-  totalRows
+  totalRows,
 ) {
   const { issues, issueBreakdown, columnTypes } = validationResult;
   const { columns } = profileResult;
@@ -72,7 +72,7 @@ export function calculateQualityScore(
     weights.completeness * completeness +
       weights.validity * validity +
       weights.uniqueness * uniquenessScore +
-      weights.consistency * consistency
+      weights.consistency * consistency,
   );
 
   return {

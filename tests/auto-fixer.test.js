@@ -215,7 +215,7 @@ function cleanData(rows, config) {
       case "removeEmptyRows":
         data = data.filter((row) => {
           return Object.values(row).some(
-            (v) => v !== null && v !== "" && v !== undefined
+            (v) => v !== null && v !== "" && v !== undefined,
           );
         });
         break;

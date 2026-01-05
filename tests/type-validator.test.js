@@ -261,7 +261,7 @@ const validators = {
   uuid: (v) => {
     if (v === null || v === undefined || v === "") return true;
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-      String(v)
+      String(v),
     );
   },
 

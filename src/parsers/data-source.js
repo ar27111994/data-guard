@@ -17,46 +17,95 @@ import {
 } from "../integrations/google-sheets.js";
 
 /**
+ * Determine data source type and return source info
+ * @param {Object} input - Configuration object with data source fields
+ * @returns {{sourceType: string, hasSource: boolean}}
+ */
+function determineDataSource(input) {
+  const { dataSourceUrl, dataSourceInline, dataSourceBase64 } = input;
+  if (dataSourceUrl) return { sourceType: "url", hasSource: true };
+  if (dataSourceInline) return { sourceType: "inline", hasSource: true };
+  if (dataSourceBase64) return { sourceType: "base64", hasSource: true };
+  return { sourceType: "unknown", hasSource: false };
+}
+
+/**
+ * Fetch raw data from URL or return inline data
+ * (Base64 data is decoded separately)
+ * @param {string} sourceType - 'url' or 'inline'
+ * @param {Object} input - Input configuration
+ * @returns {Promise<string|Buffer>} Raw data
+ */
+async function fetchRawData(sourceType, input) {
+  const { dataSourceUrl, dataSourceInline } = input;
+  switch (sourceType) {
+    case "url":
+      return fetchFromUrl(dataSourceUrl, input);
+    case "inline":
+      return dataSourceInline;
+    default:
+      throw Errors.internal(new Error(`Unsupported sourceType: ${sourceType}`));
+  }
+}
+
+/**
+ * Decode base64 data
+ * @param {string} base64Data - Base64 encoded string
+ * @returns {Buffer}
+ */
+function decodeRawData(base64Data) {
+  try {
+    return Buffer.from(base64Data, "base64");
+  } catch (error) {
+    throw Errors.invalidBase64(error);
+  }
+}
+
+/**
+ * Detect format based on source type and data
+ * @param {string} sourceType - Type of data source
+ * @param {Object} config - Configuration with format and source data
+ * @param {string|Buffer} rawData - Raw data for format detection
+ * @returns {string}
+ */
+function detectDataFormat(sourceType, config, rawData) {
+  if (config.format && config.format !== "auto") {
+    return config.format;
+  }
+  switch (sourceType) {
+    case "url":
+      return detectFormatFromUrl(config.dataSourceUrl);
+    case "inline":
+      return detectFormatFromContent(config.dataSourceInline);
+    case "base64":
+      return detectFormatFromBase64(rawData);
+    default:
+      return "csv";
+  }
+}
+
+/**
  * Parse data from various sources (URL, inline, base64)
  * @param {Object} config - Actor input configuration
  * @returns {Promise<{rows: Array, headers: Array, metadata: Object}>}
  */
 export async function parseDataSource(config) {
-  const { dataSourceUrl, dataSourceInline, dataSourceBase64, format } = config;
-
-  let rawData = null;
-  let detectedFormat = format;
-  let sourceType = "unknown";
-
   try {
-    // Determine data source
-    if (dataSourceUrl) {
-      sourceType = "url";
-      rawData = await fetchFromUrl(dataSourceUrl, config);
-      if (format === "auto") {
-        detectedFormat = detectFormatFromUrl(dataSourceUrl);
-      }
-    } else if (dataSourceInline) {
-      sourceType = "inline";
-      rawData = dataSourceInline;
-      if (format === "auto") {
-        detectedFormat = detectFormatFromContent(dataSourceInline);
-      }
-    } else if (dataSourceBase64) {
-      sourceType = "base64";
-      try {
-        rawData = Buffer.from(dataSourceBase64, "base64");
-      } catch (error) {
-        throw Errors.invalidBase64(error);
-      }
-      if (format === "auto") {
-        detectedFormat = detectFormatFromBase64(rawData);
-      }
-    } else {
+    // Step 1: Determine source
+    const { sourceType, hasSource } = determineDataSource(config);
+    if (!hasSource) {
       throw Errors.noDataSource();
     }
 
-    // Validate raw data
+    // Step 2: Fetch or decode raw data
+    let rawData;
+    if (sourceType === "base64") {
+      rawData = decodeRawData(config.dataSourceBase64);
+    } else {
+      rawData = await fetchRawData(sourceType, config);
+    }
+
+    // Step 3: Validate raw data
     if (
       !rawData ||
       (typeof rawData === "string" && rawData.trim().length === 0)
@@ -64,31 +113,14 @@ export async function parseDataSource(config) {
       throw Errors.emptyData();
     }
 
+    // Step 4: Detect format
+    const detectedFormat = detectDataFormat(sourceType, config, rawData);
     console.log(`   Source type: ${sourceType}, Format: ${detectedFormat}`);
 
-    // Parse based on detected format
-    let result;
-    switch (detectedFormat) {
-      case "csv":
-        result = await parseCsvSafe(rawData, config);
-        break;
-      case "xlsx":
-      case "xls":
-        result = await parseExcelSafe(rawData, config);
-        break;
-      case "json":
-        result = parseJsonSafe(rawData, config);
-        break;
-      case "jsonl":
-        result = parseJsonLinesSafe(rawData, config);
-        break;
-      default:
-        // Try CSV as fallback
-        console.warn(`   Unknown format '${detectedFormat}', trying CSV...`);
-        result = await parseCsvSafe(rawData, config);
-    }
+    // Step 5: Parse based on format
+    const result = await parseByFormat(rawData, detectedFormat, config);
 
-    // Validate result
+    // Step 6: Validate result
     if (!result || !result.rows) {
       throw Errors.emptyData();
     }
@@ -103,12 +135,34 @@ export async function parseDataSource(config) {
       },
     };
   } catch (error) {
-    // Re-throw DataQualityErrors as-is
     if (error instanceof DataQualityError) {
       throw error;
     }
-    // Wrap unexpected errors
     throw Errors.internal(error);
+  }
+}
+
+/**
+ * Parse data by format type
+ * @param {string|Buffer} rawData - Raw data to parse
+ * @param {string} format - Detected format
+ * @param {Object} config - Configuration
+ * @returns {Promise<{rows: Array, headers: Array}>}
+ */
+async function parseByFormat(rawData, format, config) {
+  switch (format) {
+    case "csv":
+      return parseCsvSafe(rawData, config);
+    case "xlsx":
+    case "xls":
+      return parseExcelSafe(rawData, config);
+    case "json":
+      return parseJsonSafe(rawData, config);
+    case "jsonl":
+      return parseJsonLinesSafe(rawData, config);
+    default:
+      console.warn(`   Unknown format '${format}', trying CSV...`);
+      return parseCsvSafe(rawData, config);
   }
 }
 
@@ -122,8 +176,11 @@ async function fetchFromUrl(url, config) {
     console.log(`   Converted to Google Sheets export URL`);
   }
 
+  const urlStr = typeof url === "string" ? url.trim() : String(url ?? "");
   console.log(
-    `   Fetching from: ${url.substring(0, 80)}${url.length > 80 ? "..." : ""}`
+    `   Fetching from: ${urlStr.substring(0, 80)}${
+      urlStr.length > 80 ? "..." : ""
+    }`
   );
 
   // Validate URL format
@@ -253,7 +310,7 @@ function detectFormatFromContent(content) {
  */
 function detectFormatFromBase64(buffer) {
   if (!buffer || buffer.length < 4) {
-    return "xlsx";
+    return "csv"; // Fallback to CSV for small buffers
   }
 
   // Check for ZIP magic bytes (xlsx files are ZIP archives)
@@ -272,7 +329,61 @@ function detectFormatFromBase64(buffer) {
     return "json";
   }
 
-  return "xlsx";
+  return "csv"; // Fallback to CSV as a safer default
+}
+
+/**
+ * Assess CSV parse errors and separate critical errors from warnings
+ * @param {Array} errors - Parse errors from Papa.parse
+ * @param {number} dataLength - Number of data rows
+ * @returns {{criticalErrors: Array, hasFatalErrors: boolean}}
+ */
+export function assessCsvErrors(errors, dataLength) {
+  const criticalErrors = errors.filter(
+    (e) => e.type === "Quotes" || e.type === "FieldMismatch"
+  );
+  // If no data was parsed and there are critical errors, treat as fatal
+  // Use Math.max(1, ...) to avoid division issues with very small datasets
+  const hasFatalErrors =
+    criticalErrors.length > 0 &&
+    (dataLength === 0 || criticalErrors.length > Math.max(1, dataLength * 0.5));
+  return { criticalErrors, hasFatalErrors };
+}
+
+/**
+ * Extract headers from parsed CSV result with defensive validation
+ * @param {Object} result - Papa.parse result
+ * @param {Object} config - Configuration with hasHeader option
+ * @returns {{headers: Array, rows: Array}}
+ */
+function extractCsvHeaders(result, config) {
+  const { hasHeader } = config;
+  let headers;
+  let rows = result.data;
+
+  if (hasHeader !== false) {
+    headers = result.meta.fields || [];
+  } else {
+    // Papa.parse returns arrays when header: false; normalize to objects for downstream validators
+    const firstRow = Array.isArray(result.data[0]) ? result.data[0] : [];
+    headers = firstRow.map((_, i) => `column_${i + 1}`);
+
+    rows = result.data.map((r) => {
+      if (!Array.isArray(r)) return r;
+      const obj = {};
+      headers.forEach((h, i) => {
+        obj[h] = r[i];
+      });
+      return obj;
+    });
+  }
+
+  // Validate headers - fallback extraction
+  if (headers.length === 0 && rows.length > 0) {
+    headers = Object.keys(rows[0] || {});
+  }
+
+  return { headers, rows };
 }
 
 /**
@@ -285,28 +396,24 @@ async function parseCsvSafe(data, config) {
     const parseConfig = {
       header: hasHeader !== false,
       skipEmptyLines: true,
-      dynamicTyping: false, // Keep as strings for consistent validation
+      dynamicTyping: false,
       encoding: encoding || "utf-8",
     };
 
-    // Auto-detect delimiter if needed
     if (csvDelimiter && csvDelimiter !== "auto") {
       parseConfig.delimiter = csvDelimiter;
     }
 
     const result = Papa.parse(data, parseConfig);
 
-    // Handle parse errors
+    // Assess errors using helper
     if (result.errors.length > 0) {
-      const criticalErrors = result.errors.filter(
-        (e) => e.type === "Quotes" || e.type === "FieldMismatch"
+      const { criticalErrors, hasFatalErrors } = assessCsvErrors(
+        result.errors,
+        result.data.length
       );
 
-      if (
-        criticalErrors.length > 0 &&
-        (result.data.length === 0 ||
-          criticalErrors.length > result.data.length * 0.5)
-      ) {
+      if (hasFatalErrors) {
         throw Errors.csvParseError(criticalErrors[0], criticalErrors[0].row);
       }
 
@@ -316,26 +423,8 @@ async function parseCsvSafe(data, config) {
         .forEach((e) => console.warn(`   - Row ${e.row}: ${e.message}`));
     }
 
-    let headers;
-    let rows;
-
-    if (hasHeader !== false) {
-      headers = result.meta.fields || [];
-      rows = result.data;
-    } else {
-      const firstRow = result.data[0] || [];
-      headers = Array.isArray(firstRow)
-        ? firstRow.map((_, i) => `column_${i + 1}`)
-        : Object.keys(firstRow);
-      rows = result.data;
-    }
-
-    // Validate headers
-    if (headers.length === 0 && rows.length > 0) {
-      headers = Object.keys(rows[0] || {});
-    }
-
-    return { rows, headers };
+    // Extract headers using helper
+    return extractCsvHeaders(result, config);
   } catch (error) {
     if (error instanceof DataQualityError) {
       throw error;
@@ -437,8 +526,11 @@ async function parseExcelSafe(data, config) {
 
 /**
  * Parse JSON data with error handling
+ * @param {string|Object} data - JSON string or already parsed object
+ * @param {Object} [config={}] - Configuration options (optional, used for recursive calls when handling nested data arrays)
+ * @returns {{rows: Array, headers: Array}}
  */
-function parseJsonSafe(data, config) {
+function parseJsonSafe(data, config = {}) {
   try {
     const parsed = typeof data === "string" ? JSON.parse(data) : data;
 

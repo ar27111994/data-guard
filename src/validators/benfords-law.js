@@ -99,7 +99,7 @@ export function analyzeBenfordsLaw(rows, headers, columnTypes, config) {
     let totalDeviation = 0;
     for (let d = 1; d <= 9; d++) {
       totalDeviation += Math.abs(
-        observedDistribution[d] - BENFORD_DISTRIBUTION[d]
+        (observedDistribution[d] ?? 0) - (BENFORD_DISTRIBUTION[d] ?? 0)
       );
     }
     const deviationPercent = (totalDeviation / 2) * 100; // Normalize to 0-100

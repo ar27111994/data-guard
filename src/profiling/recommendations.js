@@ -135,9 +135,13 @@ export function generateRecommendations(
 
   // Sort by priority
   const priorityOrder = { high: 0, medium: 1, low: 2 };
-  recommendations.sort(
-    (a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]
-  );
+  recommendations.sort((a, b) => {
+    const aRank = priorityOrder[a.priority] ?? Number.MAX_SAFE_INTEGER;
+    const bRank = priorityOrder[b.priority] ?? Number.MAX_SAFE_INTEGER;
+    // Tie-break with description for stable sort
+    if (aRank !== bRank) return aRank - bRank;
+    return (a.description || "").localeCompare(b.description || "");
+  });
 
   return recommendations;
 }

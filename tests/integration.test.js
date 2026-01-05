@@ -183,9 +183,9 @@ async function validateData(data, config) {
       qualityScore >= 90
         ? "A"
         : qualityScore >= 80
-        ? "B"
-        : qualityScore >= 70
-        ? "C"
-        : "D",
+          ? "B"
+          : qualityScore >= 70
+            ? "C"
+            : "D",
   };
 }

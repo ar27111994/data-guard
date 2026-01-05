@@ -94,7 +94,7 @@ export async function detectPIIInData(rows, headers, config) {
     summary,
     totalFindings: Object.values(findingCounts).reduce((a, b) => a + b, 0),
     hasHighRiskPII: findings.some(
-      (f) => f.risk === "critical" || f.risk === "high"
+      (f) => f.risk === "critical" || f.risk === "high",
     ),
   };
 }

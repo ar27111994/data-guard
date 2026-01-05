@@ -28,7 +28,7 @@ export function handleDuplicates(
   headers,
   duplicateGroups,
   strategy,
-  options = {}
+  options = {},
 ) {
   const result = {
     rows: [...rows],
