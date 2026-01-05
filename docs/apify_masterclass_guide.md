@@ -246,11 +246,13 @@ return {
 #### Phase 2: Premium Features (Week 3-4)
 
 1. **Multi-Schema Draft Support**
+
    - Draft 04, 06, 07, 2019-09, 2020-12
    - Auto-detection of schema draft
    - Compatibility warnings
 
 2. **Advanced Validation Rules**
+
    - Custom regex pattern validation
    - Conditional validation (dependentSchemas)
    - Cross-field validation (relationships)
@@ -258,18 +260,21 @@ return {
    - Circular reference detection
 
 3. **Batch Processing**
+
    - Validate 1,000+ documents in parallel
    - Streaming CSV/JSONL input support
    - Partial failure handling
    - Progress tracking
 
 4. **Error Remediation**
+
    - Suggest corrections for common errors
    - Type coercion hints
    - Default value application
    - Auto-fix for known patterns
 
 5. **Schema Linting & Warnings**
+
    - Detect unused schema fields
    - Identify overly permissive schemas
    - Security warnings (no password fields in schema?)
@@ -284,17 +289,20 @@ return {
 #### Phase 3: Integration & Ecosystem (Week 5-6)
 
 1. **Workflow Templates**
+
    - n8n: "Validate API Responses Before Processing"
    - Make: "Check JSON Format in Data Pipeline"
    - Zapier: "Validate Webhook Payloads"
    - LangChain: "Ensure LLM Output Matches Schema"
 
 2. **Public Dataset Output**
+
    - Export validation metrics for analytics
    - Track schema compliance over time
    - Generate validation health dashboards
 
 3. **Integration Examples**
+
    - Stripe webhook validation
    - GitHub API response validation
    - OpenAI API completion validation
@@ -522,7 +530,7 @@ Example: 100K requests/month @ $0.002 = $200/month
        const secondsElapsed = (now - this.lastRefill) / 1000;
        this.tokens = Math.min(
          this.capacity,
-         this.tokens + secondsElapsed * this.refillRate,
+         this.tokens + secondsElapsed * this.refillRate
        );
        this.lastRefill = now;
      }
@@ -594,6 +602,7 @@ Example: 100K requests/month @ $0.002 = $200/month
 #### Phase 2: Premium Features (Week 3-4)
 
 1. **Traffic Pattern Generation**
+
    - Constant load (baseline)
    - Spike simulation (sudden traffic burst)
    - Exponential growth (gradual load increase)
@@ -601,6 +610,7 @@ Example: 100K requests/month @ $0.002 = $200/month
    - Chaotic/random patterns
 
 2. **Chaos Engineering**
+
    - Random failure injection
    - Latency injection
    - Network timeout simulation
@@ -608,6 +618,7 @@ Example: 100K requests/month @ $0.002 = $200/month
    - Cascading failures
 
 3. **Client Behavior Testing**
+
    - Exponential backoff simulation
    - Retry limit testing
    - Queue overflow handling
@@ -615,12 +626,14 @@ Example: 100K requests/month @ $0.002 = $200/month
    - Circuit breaker patterns
 
 4. **Advanced Metrics**
+
    - Percentile analysis (p50, p95, p99, p99.9)
    - Standard deviation of latency
    - Throughput curves
    - Resource usage (CPU, memory, connections)
 
 5. **Compliance Testing**
+
    - RateLimit header validation
    - Retry-After header checking
    - Reset-After calculations
@@ -635,11 +648,13 @@ Example: 100K requests/month @ $0.002 = $200/month
 #### Phase 3: Integration & Ecosystem (Week 5-6)
 
 1. **Workflow Templates**
+
    - n8n: "Load Test Your API Before Deployment"
    - Make: "Validate API Rate Limits"
    - LangChain: "Test LLM API Rate Handling"
 
 2. **Integration Guides**
+
    - AWS API Gateway rate limit testing
    - Kong API gateway configuration
    - Nginx rate limiting validation
@@ -969,6 +984,7 @@ function detectOutliers(rows, method = "iqr") {
 #### Phase 2: Premium Features (Week 3-4)
 
 1. **Multi-Format Support**
+
    - CSV with custom delimiters
    - Excel/XLSX with sheet selection
    - JSONL streaming
@@ -976,30 +992,35 @@ function detectOutliers(rows, method = "iqr") {
    - SQL database exports
 
 2. **Advanced Type Detection**
+
    - Auto-detect column types
    - Semantic understanding (email, phone, URL detection)
    - Custom type definitions
    - Fuzzy type matching
 
 3. **Anomaly Detection**
+
    - Statistical outlier detection (IQR, Z-score)
    - ML-based pattern detection
    - Benford's Law validation (fraud detection)
    - Seasonal anomalies
 
 4. **Data Profiling**
+
    - Cardinality analysis
    - Value distribution histograms
    - Correlation analysis
    - Data lineage tracking
 
 5. **Remediation & Cleaning**
+
    - Auto-fix common issues (trim, case normalization)
    - Missing value imputation strategies
    - Duplicate handling (keep first, merge, remove)
    - Outlier handling (remove, cap, flag)
 
 6. **Compliance & Audit**
+
    - GDPR compliance checking
    - PII detection and masking
    - Audit trail of all changes
@@ -1014,12 +1035,14 @@ function detectOutliers(rows, method = "iqr") {
 #### Phase 3: Integration & Ecosystem (Week 5-6)
 
 1. **Workflow Templates**
+
    - n8n: "Validate CSV Before Warehouse Load"
    - Make: "Data Quality Check in ETL Pipeline"
    - Zapier: "Validate Exported Spreadsheets"
    - LangChain: "Ensure Dataset Quality for ML"
 
 2. **Data Source Integrations**
+
    - Google Sheets validation
    - Salesforce export validation
    - HubSpot data quality checks
@@ -1079,9 +1102,11 @@ Optimization focus:
 **Revenue Projections:**
 
 - **Option A (100 users, 10 sitemaps, 100 changes/month each):**
+
   - 100 × 10 × 100 × $0.01 = $10,000/month
 
 - **Option B (150 users, 2-5 sites, $15 avg):**
+
   - 150 × $15 = $2,250/month baseline
   - Scale to 300 users = $4,500/month
 
@@ -1292,30 +1317,35 @@ async def get_monitor_stats(monitor_id: str) -> dict:
 #### Phase 2: Premium Features (Week 3-4)
 
 1. **Advanced Sitemap Parsing**
+
    - Handle sitemap indices (sitemaps.xml)
    - Parse alternative language sitemaps
    - Support RSS/Atom feeds as alternative
    - Handle dynamic sitemaps (time-based updates)
 
 2. **Content Intelligence**
+
    - Estimate content type (blog, product, page) from URL structure
    - Priority estimation (based on update frequency)
    - Content similarity detection (find moved/renamed pages)
    - Keyword extraction from URLs
 
 3. **Change Analytics**
+
    - Trend analysis (increasing/decreasing new content)
    - Seasonal pattern detection
    - Update frequency calculation
    - Optimal check interval suggestion
 
 4. **Comparison & Tracking**
+
    - Multi-site comparison ("How does Site B compare to Site A?")
    - Competitive intelligence (track competitor updates)
    - Historical change tracking
    - Change attribution (which content changed what)
 
 5. **Notification & Filtering**
+
    - Webhook notifications for important changes
    - Slack integration
    - Email digests
@@ -1330,17 +1360,20 @@ async def get_monitor_stats(monitor_id: str) -> dict:
 #### Phase 3: Integration & Ecosystem (Week 5-6)
 
 1. **LLM Agent Integration**
+
    - Claude (Anthropic) agent tool
    - OpenAI GPT integration
    - LangChain tool wrapper
    - Memory system for agents
 
 2. **Workflow Templates**
+
    - n8n: "Monitor Competitor Website Updates"
    - Make: "Alert When New Blog Posts Published"
    - LangChain: "Agent Monitors TechCrunch for AI News"
 
 3. **Use Case Implementations**
+
    - Competitive intelligence automation
    - SEO monitoring (detect structural changes)
    - Content aggregation (multi-site monitoring)
@@ -1610,6 +1643,7 @@ Prompt:
 ### Development Checklist
 
 - [ ] **Week 1: Core MVP**
+
   - [ ] Actor scaffold created
   - [ ] Main algorithm implemented
   - [ ] Input validation working
@@ -1619,6 +1653,7 @@ Prompt:
   - [ ] README drafted
 
 - [ ] **Week 2: Quality & Features**
+
   - [ ] Quality Score >= 75
   - [ ] All premium features added
   - [ ] Integration templates created
@@ -1773,18 +1808,21 @@ Why So High?
 **Content Preparation:**
 
 1. **Blog Post** (Dev.to, Hashnode, Medium)
+
    - Title: "I Built a [Product] and Earned $X/month"
    - Structure: Problem → Solution → How to Use → Earnings
    - Length: 1,500-2,000 words
    - SEO keywords: Include product name + market need
 
 2. **GitHub Repository**
+
    - Examples directory with 10+ use cases
    - Integration templates (n8n, Make, LangChain)
    - README with badges (stars, downloads)
    - Workflow examples as YAML files
 
 3. **Twitter Thread**
+
    - 15-20 tweets covering:
      - Problem statement
      - Your solution
@@ -1834,24 +1872,28 @@ Why So High?
 **Organic Growth Channels (Zero Cost):**
 
 1. **Blog Content** (1-2 posts/month)
+
    - Topic: "How to [Problem] with [Actor]"
    - SEO-optimized titles
    - Monetization: Drive to Apify Store
    - Cross-post to Dev.to, Hashnode, Medium
 
 2. **GitHub Community**
+
    - Answer issues/questions
    - Showcase community projects using your Actor
    - Star/contribute to related projects
    - GitHub Trending participation
 
 3. **Social Media** (2-3 posts/week)
+
    - Twitter: Tips, updates, user stories
    - LinkedIn: Professional achievements, industry insights
    - Reddit: Answer questions in relevant subs
    - Discord: Engage in communities
 
 4. **SEO Optimization**
+
    - Blog posts target long-tail keywords
    - Backlinks from Dev.to, Medium, GitHub
    - Social signals (shares, comments)
@@ -2121,7 +2163,9 @@ Please ensure When implementing these plans:
 - [Monetization Documentation](https://docs.apify.com/platform/actors/publishing/monetize)
 - [Challenge Terms & Conditions](https://docs.apify.com/legal/challenge-terms-and-conditions)
 - [Apify Discord Community](https://discord.gg/jyEM2PRvMU)
-- @docs/
+- [Project Documentation](../docs/apify_masterclass_guide.md)
+- [Implementation Guidelines](../docs/quick_start_summary.md)
+- [Additional Resources](../.agent/rules/)
 
 Good luck! 🚀
 
