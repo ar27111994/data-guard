@@ -28,6 +28,11 @@ import {
 } from "./utils/performance.js";
 import { getAuditTrail } from "./compliance/audit-trail.js";
 import {
+  analyzeHistoricalTrends,
+  generateDataSourceId,
+  extractMetrics,
+} from "./profiling/historical-analyzer.js";
+import {
   DataQualityError,
   formatErrorForUser,
   formatErrorForLog,
@@ -51,6 +56,8 @@ const DEFAULT_CONFIG = {
   enableCorrelationAnalysis: false,
   enablePatternDetection: false,
   generateHTMLReport: false,
+  enableHistoricalAnalysis: false,
+  historicalCompareCount: 10,
 };
 
 /**
@@ -209,6 +216,51 @@ async function piiDetectionStage(rows, headers, config) {
   const result = await detectPIIInData(rows, headers, config);
   console.log(`✅ Found ${result.findings.length} PII instances`);
   return result;
+}
+
+/**
+ * Historical trend analysis stage
+ * @param {Object} validationResult - Validation output
+ * @param {Object} profileResult - Profiling output
+ * @param {Object} qualityScore - Quality score output
+ * @param {Object} config - Configuration
+ * @returns {Promise<Object|null>} Historical analysis result
+ */
+async function historicalAnalysisStage(
+  validationResult,
+  profileResult,
+  qualityScore,
+  config
+) {
+  if (!config.enableHistoricalAnalysis) return null;
+
+  console.log("📈 Step 6: Analyzing historical trends...");
+
+  try {
+    const dataSourceId = generateDataSourceId(config);
+    const currentMetrics = extractMetrics(
+      validationResult,
+      profileResult,
+      qualityScore
+    );
+
+    const result = await analyzeHistoricalTrends(
+      dataSourceId,
+      currentMetrics,
+      config.historicalCompareCount || 10
+    );
+
+    console.log(
+      `✅ Analyzed ${result.previousRuns} previous runs. Trend: ${
+        result.trends?.qualityScore?.direction || "N/A"
+      }`
+    );
+
+    return result;
+  } catch (error) {
+    console.warn(`   Historical analysis failed: ${error.message}`);
+    return { enabled: true, error: error.message };
+  }
 }
 
 /**
@@ -475,6 +527,14 @@ async function main() {
     );
     console.log(`✅ Generated ${recommendations.length} recommendations`);
 
+    // Step 6b: Historical trend analysis (if enabled)
+    const historicalResult = await historicalAnalysisStage(
+      validationResult,
+      profileResult,
+      qualityScore,
+      config
+    );
+
     // Step 7: Generate cleaned data (if enabled)
     let cleanedDataUrl = null;
     if (config.generateCleanData) {
@@ -543,6 +603,7 @@ async function main() {
       ...(correlationsResult && { correlations: correlationsResult }),
       ...(patternResult && { patterns: patternResult }),
       ...(piiResult && { pii: piiResult }),
+      ...(historicalResult && { historicalAnalysis: historicalResult }),
       ...(cleanedDataUrl && { cleanDataUrl: cleanedDataUrl }),
       metadata: {
         ...parseResult.metadata,

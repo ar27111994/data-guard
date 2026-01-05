@@ -172,8 +172,20 @@ async function parseByFormat(rawData, format, config) {
 async function fetchFromUrl(url, config) {
   // Handle Google Sheets URLs specially
   if (isGoogleSheetsUrl(url)) {
-    url = getGoogleSheetsExportUrl(url, "csv");
-    console.log(`   Converted to Google Sheets export URL`);
+    const sheetId = config.googleSheetsId || null;
+    url = getGoogleSheetsExportUrl(url, "csv", sheetId);
+    console.log(
+      `   Converted to Google Sheets export URL${
+        sheetId ? ` (sheet: ${sheetId})` : ""
+      }`
+    );
+
+    // If API key provided, append it
+    if (config.googleSheetsApiKey) {
+      const separator = url.includes("?") ? "&" : "?";
+      url = `${url}${separator}key=${config.googleSheetsApiKey}`;
+      console.log(`   Using Google Sheets API key for authentication`);
+    }
   }
 
   const urlStr = typeof url === "string" ? url.trim() : String(url ?? "");
