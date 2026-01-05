@@ -299,7 +299,10 @@ export function validateData(rows, headers, config) {
 
     // Stage 8: Enforce issue limits
     // Multiplier is configurable via config.issueLimitMultiplier (default: 10)
-    const multiplier = config.issueLimitMultiplier || 10;
+    const rawMultiplier = Number(config.issueLimitMultiplier);
+    const multiplier = Number.isFinite(rawMultiplier)
+      ? Math.max(1, Math.floor(rawMultiplier))
+      : 10;
     const maxIssues = (config.maxIssuesPerType || 100) * multiplier;
     let truncatedIssues = issues;
     if (issues.length > maxIssues) {

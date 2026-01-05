@@ -306,7 +306,7 @@ function detectFormatFromContent(content) {
  */
 function detectFormatFromBase64(buffer) {
   if (!buffer || buffer.length < 4) {
-    return "xlsx";
+    return "csv"; // Fallback to CSV for small buffers
   }
 
   // Check for ZIP magic bytes (xlsx files are ZIP archives)
@@ -325,7 +325,7 @@ function detectFormatFromBase64(buffer) {
     return "json";
   }
 
-  return "xlsx";
+  return "csv"; // Fallback to CSV as a safer default
 }
 
 /**
@@ -360,9 +360,18 @@ function extractCsvHeaders(result, config) {
   if (hasHeader !== false) {
     headers = result.meta.fields || [];
   } else {
-    // Papa.parse always returns arrays for header: false mode
-    const firstRow = result.data[0] || [];
+    // Papa.parse returns arrays when header: false; normalize to objects for downstream validators
+    const firstRow = Array.isArray(result.data[0]) ? result.data[0] : [];
     headers = firstRow.map((_, i) => `column_${i + 1}`);
+
+    rows = result.data.map((r) => {
+      if (!Array.isArray(r)) return r;
+      const obj = {};
+      headers.forEach((h, i) => {
+        obj[h] = r[i];
+      });
+      return obj;
+    });
   }
 
   // Validate headers - fallback extraction

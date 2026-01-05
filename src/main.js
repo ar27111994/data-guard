@@ -230,9 +230,13 @@ function outputGenerationStage(context) {
     processingTime,
   } = context;
 
+  const validatedRowCount = Array.isArray(context.dataToValidate)
+    ? context.dataToValidate.length
+    : rows.length;
+
   const summary = {
-    totalRows: rows.length,
-    validRows: rows.length - validationResult.invalidRowCount,
+    totalRows: validatedRowCount,
+    validRows: validatedRowCount - validationResult.invalidRowCount,
     invalidRows: validationResult.invalidRowCount,
     qualityScore: qualityScore.overall,
     processingTimeMs: processingTime,
@@ -279,7 +283,10 @@ function outputGenerationStage(context) {
     details: outlierIssues.slice(0, 100).map((o) => ({
       column: o.column,
       rowNumber: o.rowNumber,
-      value: parseFloat(o.value) || o.value,
+      value: (() => {
+        const parsed = parseFloat(o.value);
+        return isNaN(parsed) ? o.value : parsed;
+      })(),
       reason: o.message,
     })),
   };
@@ -468,61 +475,25 @@ async function main() {
     const processingTime = Date.now() - startTime;
 
     // Build comprehensive output per masterclass schema
-    const summary = {
-      totalRows: rows.length,
-      validRows: rows.length - validationResult.invalidRowCount,
-      invalidRows: validationResult.invalidRowCount,
-      qualityScore: qualityScore.overall,
-      processingTimeMs: processingTime,
+    // Build comprehensive output using stage function
+    const outputContext = {
+      rows,
+      headers,
+      validationResult,
+      profileResult,
+      qualityScore,
+      benfordsResult,
+      correlationsResult,
+      patternResult,
+      piiResult,
+      cleanedDataUrl,
+      parseResult,
+      config,
+      processingTime,
+      dataToValidate, // Needed for consistent row counts
     };
-
-    const dataQuality = {
-      completeness: qualityScore.completeness,
-      uniqueness: qualityScore.uniqueness,
-      consistency: qualityScore.consistency,
-      validity: qualityScore.validity,
-      accuracy: qualityScore.overall, // Based on overall assessment
-    };
-
-    const columnAnalysis = headers.map((header) => {
-      const col = profileResult.columns[header];
-      return {
-        column: header,
-        type: col.detectedType,
-        stats: {
-          nullCount: col.nullCount,
-          uniqueCount: col.uniqueCount,
-          nullPercent: parseFloat(col.nullPercent),
-          duplicates: col.totalCount - col.uniqueCount,
-        },
-        ...(col.numericStats && { numericStats: col.numericStats }),
-        ...(col.stringStats && { stringStats: col.stringStats }),
-      };
-    });
-
-    // Group duplicates by matching values
-    const duplicateIssues = validationResult.issues.filter(
-      (i) => i.issueType === "duplicate"
-    );
-    const duplicates = {
-      totalDuplicates: duplicateIssues.length,
-      duplicateRows: groupDuplicates(duplicateIssues),
-    };
-
-    // Group outliers
-    const outlierIssues = validationResult.issues.filter(
-      (i) => i.issueType === "outlier"
-    );
-    const outliers = {
-      detected: outlierIssues.length,
-      method: config.detectOutliers,
-      details: outlierIssues.slice(0, 100).map((o) => ({
-        column: o.column,
-        rowNumber: o.rowNumber,
-        value: parseFloat(o.value) || o.value,
-        reason: o.message,
-      })),
-    };
+    const { summary, dataQuality, columnAnalysis, duplicates, outliers } =
+      outputGenerationStage(outputContext);
 
     // Push summary to dataset
     await Actor.pushData({
