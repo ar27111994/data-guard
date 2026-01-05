@@ -15,7 +15,7 @@ export function generateRecommendations(
   validationResult,
   profileResult,
   qualityScore,
-  config,
+  config
 ) {
   const recommendations = [];
 
@@ -136,7 +136,9 @@ export function generateRecommendations(
   // Sort by priority
   const priorityOrder = { high: 0, medium: 1, low: 2 };
   recommendations.sort(
-    (a, b) => priorityOrder[a.priority] - priorityOrder[b.priority],
+    (a, b) =>
+      (priorityOrder[a.priority] ?? Number.MAX_SAFE_INTEGER) -
+      (priorityOrder[b.priority] ?? Number.MAX_SAFE_INTEGER)
   );
 
   return recommendations;

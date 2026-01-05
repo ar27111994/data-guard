@@ -1,4 +1,3 @@
-import { jest } from "@jest/globals";
 import { assessCsvErrors } from "../src/parsers/data-source.js";
 
 describe("assessCsvErrors", () => {
@@ -17,7 +16,7 @@ describe("assessCsvErrors", () => {
     const result = assessCsvErrors(errors, 100);
     expect(result.criticalErrors).toHaveLength(2);
     expect(result.criticalErrors.map((e) => e.type)).toEqual(
-      expect.arrayContaining(["Quotes", "FieldMismatch"]),
+      expect.arrayContaining(["Quotes", "FieldMismatch"])
     );
   });
 
@@ -41,12 +40,6 @@ describe("assessCsvErrors", () => {
   test("triggers fatal error if any critical error exists with 0 rows (failed parse)", () => {
     const errors = [{ type: "Quotes", message: "Fatal parse error" }];
     const result = assessCsvErrors(errors, 0); // 0 rows parsed
-    expect(result.hasFatalErrors).toBe(true);
-  });
-
-  test("triggers fatal error if any critical error exists with empty data (0 rows)", () => {
-    const errors = [{ type: "Quotes", message: "Fatal parse error" }];
-    const result = assessCsvErrors(errors, 0);
     expect(result.hasFatalErrors).toBe(true);
   });
 

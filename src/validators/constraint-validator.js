@@ -93,7 +93,7 @@ function validateMinMax(value, column, rowIndex, constraints, aggregator) {
       value,
       "range-min-violation",
       `Value ${numValue} is below minimum ${constraints.min}`,
-      `Ensure value is at least ${constraints.min}`,
+      `Ensure value is at least ${constraints.min}`
     );
   }
 
@@ -104,7 +104,7 @@ function validateMinMax(value, column, rowIndex, constraints, aggregator) {
       value,
       "range-max-violation",
       `Value ${numValue} exceeds maximum ${constraints.max}`,
-      `Ensure value is at most ${constraints.max}`,
+      `Ensure value is at most ${constraints.max}`
     );
   }
 }
@@ -130,7 +130,7 @@ function validateLength(value, column, rowIndex, constraints, aggregator) {
       value,
       "length-min-violation",
       `Value length ${strValue.length} is below minimum ${constraints.minLength}`,
-      `Provide at least ${constraints.minLength} characters`,
+      `Provide at least ${constraints.minLength} characters`
     );
   }
 
@@ -144,7 +144,7 @@ function validateLength(value, column, rowIndex, constraints, aggregator) {
       value,
       "length-max-violation",
       `Value length ${strValue.length} exceeds maximum ${constraints.maxLength}`,
-      `Limit to ${constraints.maxLength} characters`,
+      `Limit to ${constraints.maxLength} characters`
     );
   }
 }
@@ -170,7 +170,7 @@ function validatePattern(value, column, rowIndex, constraints, aggregator) {
       value,
       "pattern-violation",
       `Value does not match required pattern: ${constraints.pattern}`,
-      "Ensure value matches the expected format",
+      "Ensure value matches the expected format"
     );
   }
 }
@@ -187,7 +187,10 @@ function validateEnum(value, column, rowIndex, constraints, aggregator) {
   if (!constraints.allowedValues || !Array.isArray(constraints.allowedValues))
     return;
 
-  if (!constraints.allowedValues.includes(value)) {
+  const normalized = String(value);
+  const allowedNormalized = constraints.allowedValues.map((v) => String(v));
+
+  if (!allowedNormalized.includes(normalized)) {
     const displayValues = constraints.allowedValues.slice(0, 5).join(", ");
     const suffix = constraints.allowedValues.length > 5 ? "..." : "";
 
@@ -197,7 +200,7 @@ function validateEnum(value, column, rowIndex, constraints, aggregator) {
       value,
       "enum-violation",
       `Value '${value}' is not in allowed values: ${displayValues}${suffix}`,
-      `Use one of: ${displayValues}`,
+      `Use one of: ${displayValues}`
     );
   }
 }

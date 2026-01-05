@@ -176,8 +176,11 @@ async function fetchFromUrl(url, config) {
     console.log(`   Converted to Google Sheets export URL`);
   }
 
+  const urlStr = typeof url === "string" ? url.trim() : String(url ?? "");
   console.log(
-    `   Fetching from: ${url.substring(0, 80)}${url.length > 80 ? "..." : ""}`
+    `   Fetching from: ${urlStr.substring(0, 80)}${
+      urlStr.length > 80 ? "..." : ""
+    }`
   );
 
   // Validate URL format

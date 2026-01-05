@@ -4,21 +4,7 @@
  * With modular section builder functions and XSS prevention
  */
 import { Actor } from "apify";
-
-/**
- * Escape HTML special characters to prevent XSS
- * @param {*} value - Value to escape
- * @returns {string} HTML-escaped string
- */
-function escapeHtml(value) {
-  if (value === null || value === undefined) return "";
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
+import { sanitizeForHTML } from "../utils/edge-cases.js";
 
 /**
  * Safely get a numeric value with fallback
@@ -76,21 +62,23 @@ function buildSummaryCards(summary) {
     <div class="grid">
       <div class="card">
         <div class="score-ring">
-          <div class="inner">${escapeHtml(Math.round(score))}</div>
+          <div class="inner">${sanitizeForHTML(Math.round(score))}</div>
         </div>
         <h3 style="text-align:center">Quality Score</h3>
       </div>
       <div class="card success">
         <h3>Total Rows</h3>
-        <div class="value">${escapeHtml(totalRows.toLocaleString())}</div>
+        <div class="value">${sanitizeForHTML(totalRows.toLocaleString())}</div>
       </div>
       <div class="card success">
         <h3>Valid Rows</h3>
-        <div class="value">${escapeHtml(validRows.toLocaleString())}</div>
+        <div class="value">${sanitizeForHTML(validRows.toLocaleString())}</div>
       </div>
       <div class="card ${invalidRows > 0 ? "error" : "success"}">
         <h3>Invalid Rows</h3>
-        <div class="value">${escapeHtml(invalidRows.toLocaleString())}</div>
+        <div class="value">${sanitizeForHTML(
+          invalidRows.toLocaleString()
+        )}</div>
       </div>
     </div>`;
 }
@@ -142,11 +130,11 @@ function buildColumnAnalysisTable(columnAnalysis) {
     .map(
       (col) => `
       <tr>
-        <td><strong>${escapeHtml(col.column)}</strong></td>
-        <td>${escapeHtml(col.type)}</td>
+        <td><strong>${sanitizeForHTML(col.column)}</strong></td>
+        <td>${sanitizeForHTML(col.type)}</td>
         <td>${safeNumber(col.stats?.nullPercent, 0)}%</td>
         <td>${safeNumber(col.stats?.uniqueCount, 0)}</td>
-      </tr>`,
+      </tr>`
     )
     .join("");
 
@@ -178,16 +166,16 @@ function buildIssuesTable(issues) {
   const rows = issues
     .slice(0, 50)
     .map((issue) => {
-      const rowNum = escapeHtml(issue.rowNumber);
-      const column = escapeHtml(issue.column);
-      const message = escapeHtml(issue.message || issue.issueType);
-      const severity = escapeHtml(issue.severity);
+      const rowNum = sanitizeForHTML(issue.rowNumber);
+      const column = sanitizeForHTML(issue.column);
+      const message = sanitizeForHTML(issue.message || issue.issueType);
+      const severity = sanitizeForHTML(issue.severity);
       const badgeClass =
         issue.severity === "error"
           ? "error"
           : issue.severity === "warning"
-            ? "warning"
-            : "info";
+          ? "warning"
+          : "info";
 
       return `
       <tr>
@@ -201,15 +189,15 @@ function buildIssuesTable(issues) {
 
   const truncationNote =
     issues.length > 50
-      ? `<p style="margin-top: 1rem; color: var(--muted);">Showing first 50 of ${escapeHtml(
-          issues.length,
+      ? `<p style="margin-top: 1rem; color: var(--muted);">Showing first 50 of ${sanitizeForHTML(
+          issues.length
         )} issues</p>`
       : "";
 
   return `
     <div class="card" style="margin-bottom: 2rem;">
-      <h2 style="margin-bottom: 1rem;">⚠️ Issues Found (${escapeHtml(
-        issues.length,
+      <h2 style="margin-bottom: 1rem;">⚠️ Issues Found (${sanitizeForHTML(
+        issues.length
       )})</h2>
       <table>
         <thead>
@@ -242,7 +230,7 @@ function buildRecommendationsSection(recommendations) {
         typeof rec === "string" ? rec : rec.description || rec.title || "";
       return `
       <li style="padding: 0.75rem; background: #f0f9ff; border-radius: 8px; margin-bottom: 0.5rem;">
-        ${escapeHtml(text)}
+        ${sanitizeForHTML(text)}
       </li>`;
     })
     .join("");
@@ -359,14 +347,14 @@ export async function generateHTMLReport(qualityReport, _config) {
     metadata,
   } = qualityReport;
 
-  const timestamp = escapeHtml(
-    metadata?.validatedAt || new Date().toISOString(),
+  const timestamp = sanitizeForHTML(
+    metadata?.validatedAt || new Date().toISOString()
   );
   // Clamp processing time to sensible range (0 to 1 hour)
   const processingTime = clamp(
     safeNumber(summary.processingTimeMs, 0),
     0,
-    MAX_PROCESSING_TIME_MS,
+    MAX_PROCESSING_TIME_MS
   );
 
   const html = `
@@ -406,7 +394,7 @@ export async function generateHTMLReport(qualityReport, _config) {
   } catch (error) {
     console.error("Failed to save QUALITY_REPORT_HTML:", error.message);
     throw new Error(
-      `Failed to save HTML report to key-value store: ${error.message}`,
+      `Failed to save HTML report to key-value store: ${error.message}`
     );
   }
 
