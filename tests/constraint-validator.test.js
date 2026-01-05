@@ -63,7 +63,9 @@ describe("Constraint Validator", () => {
       const result2 = validatePattern("DEF", pattern);
       expect(result1).toBeNull();
       expect(result2).toBeNull();
-      // Cache is used internally - verified by repeated calls not throwing
+      // Verify cache contains the pattern
+      expect(regexCache.has(pattern)).toBe(true);
+      expect(regexCache.size).toBe(1);
     });
   });
 

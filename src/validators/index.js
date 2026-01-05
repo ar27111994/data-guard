@@ -46,6 +46,7 @@ function validateDataTypes(rows, headers, config) {
       }
       if (!headers.includes(col.name)) {
         warnings.push(`Schema column '${col.name}' not found in data headers`);
+        return; // Skip assignment for columns not in headers
       }
       columnTypes[col.name] = col;
     });

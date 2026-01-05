@@ -346,10 +346,10 @@ function buildStyles(qualityScore) {
 /**
  * Generate HTML validation report
  * @param {Object} qualityReport - Complete quality report object
- * @param {Object} config - Configuration
+ * @param {Object} _config - Configuration (reserved for future use)
  * @returns {Promise<string>} Key name where report is saved
  */
-export async function generateHTMLReport(qualityReport, config) {
+export async function generateHTMLReport(qualityReport, _config) {
   const {
     summary,
     dataQuality,

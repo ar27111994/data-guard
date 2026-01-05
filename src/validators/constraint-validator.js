@@ -23,7 +23,7 @@ function getCompiledRegex(pattern, column) {
     return cached === "invalid" ? null : cached;
   }
 
-  // Evict oldest entry if cache is full (simple LRU-like eviction)
+  // Evict oldest entry if cache is full (FIFO eviction)
   if (regexCache.size >= MAX_REGEX_CACHE_SIZE) {
     const oldestKey = regexCache.keys().next().value;
     regexCache.delete(oldestKey);

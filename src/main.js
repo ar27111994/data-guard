@@ -97,12 +97,12 @@ async function parseStage(config, timer) {
  * @param {Array} headers - Column headers
  * @param {Object} config - Configuration
  * @param {Object} timer - Performance timer
- * @returns {Promise<Object>} Validation result
+ * @returns {Object} Validation result
  */
-async function validateStage(rows, headers, config, timer) {
+function validateStage(rows, headers, config, timer) {
   timer.start("validation");
   console.log("🔍 Step 2: Validating data quality...");
-  const result = await validateData(rows, headers, config);
+  const result = validateData(rows, headers, config);
   timer.end("validation");
   console.log(`✅ Found ${result.issues.length} issues`);
   return result;
@@ -149,7 +149,7 @@ function scoreStage(validationResult, profileResult, totalRows) {
  */
 function benfordsAnalysisStage(rows, headers, columnTypes, config) {
   if (!config.enableBenfordsLaw) return null;
-  console.log("📊 Step 5a: Benford's Law analysis...");
+  console.log("📊 Step 4a: Benford's Law analysis...");
   const result = analyzeBenfordsLaw(rows, headers, columnTypes, config);
   console.log(
     `✅ Analyzed ${result.columnsAnalyzed} columns, ${result.violations.length} violations`
@@ -167,7 +167,7 @@ function benfordsAnalysisStage(rows, headers, columnTypes, config) {
  */
 function correlationAnalysisStage(rows, headers, columnTypes, config) {
   if (!config.enableCorrelationAnalysis) return null;
-  console.log("📊 Step 5b: Correlation analysis...");
+  console.log("📊 Step 4b: Correlation analysis...");
   const result = analyzeCorrelations(rows, headers, columnTypes);
   console.log(
     `✅ Found ${result.strongCorrelations.length} strong correlations`
@@ -185,7 +185,7 @@ function correlationAnalysisStage(rows, headers, columnTypes, config) {
  */
 function patternDetectionStage(rows, headers, columnTypes, config) {
   if (!config.enablePatternDetection) return null;
-  console.log("🔬 Step 5c: ML-based pattern detection...");
+  console.log("🔬 Step 4c: ML-based pattern detection...");
   const result = detectPatterns(rows, headers, columnTypes, config);
   console.log(
     `✅ Found ${result.summary.patternsFound} patterns, ${result.summary.anomaliesFound} anomalies`
@@ -202,7 +202,7 @@ function patternDetectionStage(rows, headers, columnTypes, config) {
  */
 async function piiDetectionStage(rows, headers, config) {
   if (!config.detectPII) return null;
-  console.log("🔒 Step 6: Detecting PII...");
+  console.log("🔒 Step 5: Detecting PII...");
   const result = await detectPIIInData(rows, headers, config);
   console.log(`✅ Found ${result.findings.length} PII instances`);
   return result;
@@ -398,7 +398,7 @@ async function main() {
     }
 
     // Step 2: Validate data against schema (using stage function)
-    const validationResult = await validateStage(
+    const validationResult = validateStage(
       dataToValidate,
       headers,
       config,
@@ -532,12 +532,13 @@ async function main() {
       timestamp: new Date().toISOString(),
     });
 
-    // Push issues to dataset (with limit)
-    for (const issue of validationResult.issues.slice(
+    // Push issues to dataset (batched for performance)
+    const issuesToPush = validationResult.issues.slice(
       0,
       config.maxIssuesPerType * 10
-    )) {
-      await Actor.pushData(issue);
+    );
+    if (issuesToPush.length > 0) {
+      await Actor.pushData(issuesToPush);
     }
 
     // Build comprehensive quality report
