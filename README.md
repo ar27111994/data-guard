@@ -85,6 +85,33 @@ Enterprise-grade data quality validation for CSV, Excel, and JSON files. Detect 
 - **Duplicate Removal**: Automatically deduplicate data
 - **Export**: Download cleaned CSV
 
+### Missing Value Imputation
+
+- **Mean/Median/Mode**: Statistical filling strategies
+- **Forward/Backward Fill**: Time-series aware filling
+- **Constant Value**: Custom default values
+
+### Advanced Analytics
+
+- **Benford's Law**: Fraud detection for financial data
+- **Correlation Analysis**: Detect relationships between columns
+- **Seasonal Detection**: Day/week/month pattern analysis
+- **Historical Trend Analysis**: Track quality over time with predictions
+
+### Data Lineage
+
+- **Transformation Tracking**: Full audit trail of all changes
+- **Flow Diagrams**: Visual representation of data pipeline
+- **Compliance Reports**: GDPR/CCPA audit support
+
+### Third-Party Integrations
+
+- **Google Sheets**: Direct validation from spreadsheets
+- **Salesforce**: Validate CRM exports
+- **HubSpot**: Check contact/company data quality
+- **Stripe**: Validate payment data
+- **Airtable**: Database validation
+
 ## 📊 Supported Formats
 
 | Format     | Extension       | Features                                   |
@@ -93,6 +120,7 @@ Enterprise-grade data quality validation for CSV, Excel, and JSON files. Detect 
 | Excel      | .xlsx, .xls     | Multi-sheet, cell formatting preservation  |
 | JSON       | .json           | Object arrays, nested structure handling   |
 | JSON Lines | .jsonl, .ndjson | Streaming support for large files          |
+| Parquet    | .parquet        | Columnar format, schema extraction         |
 
 ## 💰 Pricing (Pay-per-Event)
 

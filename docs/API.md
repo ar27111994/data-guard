@@ -189,6 +189,86 @@ GET https://api.apify.com/v2/actor-runs/{runId}/dataset/items
 | `generateHTMLReport`        | boolean | `false` | Create HTML report       |
 | `enableAuditTrail`          | boolean | `false` | Compliance logging       |
 
+### Google Sheets Options
+
+| Field                | Type   | Required | Description                              |
+| -------------------- | ------ | -------- | ---------------------------------------- |
+| `googleSheetsId`     | string | No       | Specific sheet GID (from URL `#gid=123`) |
+| `googleSheetsApiKey` | string | No       | API key for private sheets               |
+
+### Missing Value Imputation
+
+| Field                | Type   | Default  | Description                                                                   |
+| -------------------- | ------ | -------- | ----------------------------------------------------------------------------- |
+| `imputationStrategy` | enum   | `remove` | `remove`, `mean`, `median`, `mode`, `forwardFill`, `backwardFill`, `constant` |
+| `imputationConstant` | string | -        | Value to use when strategy is `constant`                                      |
+
+### Historical Trend Analysis
+
+| Field                      | Type    | Default | Description                        |
+| -------------------------- | ------- | ------- | ---------------------------------- |
+| `enableHistoricalAnalysis` | boolean | `false` | Track quality metrics over time    |
+| `historicalCompareCount`   | integer | `10`    | Number of previous runs to compare |
+| `dataSourceIdentifier`     | string  | -       | Custom identifier for tracking     |
+
+### Seasonal Detection
+
+| Field                     | Type    | Default | Description                    |
+| ------------------------- | ------- | ------- | ------------------------------ |
+| `enableSeasonalDetection` | boolean | `false` | Detect day/week/month patterns |
+
+### Data Lineage
+
+| Field               | Type    | Default | Description                    |
+| ------------------- | ------- | ------- | ------------------------------ |
+| `enableDataLineage` | boolean | `false` | Track all data transformations |
+
+### Third-Party Connectors
+
+| Field             | Type   | Required | Description                                       |
+| ----------------- | ------ | -------- | ------------------------------------------------- |
+| `connectorType`   | enum   | No       | `salesforce`, `hubspot`, `stripe`, `airtable`     |
+| `connectorConfig` | object | No       | Connector-specific configuration (API keys, etc.) |
+
+**Connector Configuration Examples:**
+
+```json
+// Salesforce
+{
+  "connectorType": "salesforce",
+  "connectorConfig": {
+    "accessToken": "YOUR_TOKEN",
+    "instanceUrl": "https://your-org.salesforce.com"
+  }
+}
+
+// HubSpot
+{
+  "connectorType": "hubspot",
+  "connectorConfig": {
+    "apiKey": "YOUR_API_KEY"
+  }
+}
+
+// Stripe
+{
+  "connectorType": "stripe",
+  "connectorConfig": {
+    "secretKey": "sk_live_..."
+  }
+}
+
+// Airtable
+{
+  "connectorType": "airtable",
+  "connectorConfig": {
+    "apiKey": "YOUR_KEY",
+    "baseId": "appXXX",
+    "tableId": "tblXXX"
+  }
+}
+```
+
 ---
 
 ## Output Schema Reference

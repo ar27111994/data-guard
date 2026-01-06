@@ -10,12 +10,13 @@ Common questions and answers about the DataGuard Data Quality Checker.
 
 DataGuard supports the following formats:
 
-| Format     | Extensions          | Notes                                                  |
-| ---------- | ------------------- | ------------------------------------------------------ |
-| CSV        | `.csv`              | Auto-delimiter detection (comma, semicolon, tab, pipe) |
-| Excel      | `.xlsx`, `.xls`     | Multi-sheet support, specify sheet by name or index    |
-| JSON       | `.json`             | Arrays of objects                                      |
-| JSON Lines | `.jsonl`, `.ndjson` | One JSON object per line                               |
+| Format     | Extensions          | Notes                                                    |
+| ---------- | ------------------- | -------------------------------------------------------- |
+| CSV        | `.csv`              | Auto-delimiter detection (comma, semicolon, tab, pipe)   |
+| Excel      | `.xlsx`, `.xls`     | Multi-sheet support, specify sheet by name or index      |
+| JSON       | `.json`             | Arrays of objects                                        |
+| JSON Lines | `.jsonl`, `.ndjson` | One JSON object per line                                 |
+| Parquet    | `.parquet`          | Apache Parquet columnar format (requires parquetjs-lite) |
 
 ### How does auto-detection work?
 
@@ -181,6 +182,56 @@ Yes! Use the `schemaDefinition` input:
   ]
 }
 ```
+
+### How do I handle missing values?
+
+Use the `imputationStrategy` option:
+
+| Strategy       | Description                     |
+| -------------- | ------------------------------- |
+| `remove`       | Remove rows with missing values |
+| `mean`         | Fill with column average        |
+| `median`       | Fill with column median         |
+| `mode`         | Fill with most frequent value   |
+| `forwardFill`  | Use previous row's value        |
+| `backwardFill` | Use next row's value            |
+| `constant`     | Use custom value                |
+
+### How does historical trend analysis work?
+
+When `enableHistoricalAnalysis` is true, DataGuard:
+
+1. Stores quality metrics after each run
+2. Compares with previous runs (last 10 by default)
+3. Calculates trends (improving/declining/stable)
+4. Detects anomalies using Z-score analysis
+5. Predicts next run's quality score
+
+### What third-party connectors are available?
+
+| Connector  | Auth Type | Description                  |
+| ---------- | --------- | ---------------------------- |
+| Salesforce | OAuth     | Validate any SOQL query      |
+| HubSpot    | API Key   | Contacts, Companies, Deals   |
+| Stripe     | API Key   | Charges, Customers, Invoices |
+| Airtable   | API Key   | Any table in any base        |
+
+### How does seasonal detection work?
+
+When `enableSeasonalDetection` is enabled, DataGuard analyzes:
+
+- **Day-of-week patterns**: Detect weekend vs. weekday anomalies
+- **Monthly patterns**: Identify month-over-month trends
+- **Overall trends**: Linear regression on time-series data
+
+### What is data lineage tracking?
+
+When `enableDataLineage` is true, DataGuard tracks:
+
+- All transformations applied to data
+- Column-level changes
+- Timing and sequence of operations
+- Generates a visual flow diagram
 
 ---
 

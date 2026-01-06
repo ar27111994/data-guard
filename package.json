@@ -19,5 +19,8 @@
   },
   "devDependencies": {
     "jest": "^29.7.0"
+  },
+  "optionalDependencies": {
+    "parquetjs-lite": "^0.8.7"
   }
 }
