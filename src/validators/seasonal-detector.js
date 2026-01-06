@@ -45,9 +45,11 @@ function parseDate(value) {
 
   // Try parsing string
   if (typeof value === "string") {
-    // ISO format first (handles timestamps)
-    const isoDate = new Date(value);
-    if (!isNaN(isoDate)) return isoDate;
+    // Only use native parser for ISO 8601 format (YYYY-MM-DDTHH:mm:ss...)
+    if (/^\d{4}-\d{2}-\d{2}(T|$)/.test(value)) {
+      const isoDate = new Date(value);
+      if (!isNaN(isoDate)) return isoDate;
+    }
 
     // Common date formats with capture groups
     const formats = [

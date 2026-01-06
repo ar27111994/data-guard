@@ -308,15 +308,26 @@ function imputeColumn(rows, column, strategy, options = {}) {
   }
 
   // Calculate counts:
-  // imputedCount = values filled, rowsRemoved = rows dropped
+  // imputedCount = actual values filled, rowsRemoved = rows dropped
   const rowsRemoved =
     effectiveStrategy === IMPUTATION_STRATEGIES.REMOVE
       ? rows.length - imputedRows.length
       : 0;
-  const imputedCount =
-    effectiveStrategy === IMPUTATION_STRATEGIES.REMOVE
-      ? 0
-      : originalMissingCount;
+
+  // For non-REMOVE strategies, count actual values that were filled
+  let imputedCount = 0;
+  if (
+    effectiveStrategy !== IMPUTATION_STRATEGIES.REMOVE &&
+    effectiveStrategy !== "none"
+  ) {
+    for (let i = 0; i < rows.length; i++) {
+      const wasMissing = isMissing(rows[i][column]);
+      const isNowFilled = !isMissing(imputedRows[i]?.[column]);
+      if (wasMissing && isNowFilled) {
+        imputedCount++;
+      }
+    }
+  }
 
   return {
     rows: imputedRows,
