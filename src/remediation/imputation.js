@@ -202,6 +202,21 @@ function imputeColumn(rows, column, strategy, options = {}) {
         // Fall back to mode for non-numeric
         imputeValue = calculateMode(values);
         effectiveStrategy = IMPUTATION_STRATEGIES.MODE;
+        // Skip imputation if no valid mode exists
+        if (imputeValue === undefined) {
+          return {
+            rows,
+            stats: {
+              column,
+              strategy: "none",
+              columnType,
+              missingCount: originalMissingCount,
+              imputedCount: 0,
+              rowsRemoved: 0,
+              imputeValue: null,
+            },
+          };
+        }
       } else {
         imputeValue = calculateMean(values);
       }
@@ -215,6 +230,21 @@ function imputeColumn(rows, column, strategy, options = {}) {
       if (columnType !== "numeric") {
         imputeValue = calculateMode(values);
         effectiveStrategy = IMPUTATION_STRATEGIES.MODE;
+        // Skip imputation if no valid mode exists
+        if (imputeValue === undefined) {
+          return {
+            rows,
+            stats: {
+              column,
+              strategy: "none",
+              columnType,
+              missingCount: originalMissingCount,
+              imputedCount: 0,
+              rowsRemoved: 0,
+              imputeValue: null,
+            },
+          };
+        }
       } else {
         imputeValue = calculateMedian(values);
       }

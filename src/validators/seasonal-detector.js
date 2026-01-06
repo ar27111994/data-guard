@@ -99,6 +99,10 @@ function parseDate(value) {
  * @returns {Array<string>} Date column names
  */
 export function detectDateColumns(rows, headers) {
+  if (!rows || rows.length === 0) {
+    return [];
+  }
+
   const dateColumns = [];
   const sampleSize = Math.min(rows.length, 100);
 
