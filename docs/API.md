@@ -232,8 +232,9 @@ GET https://api.apify.com/v2/actor-runs/{runId}/dataset/items
 
 **Connector Configuration Examples:**
 
+**Salesforce:**
+
 ```json
-// Salesforce
 {
   "connectorType": "salesforce",
   "connectorConfig": {
@@ -241,24 +242,33 @@ GET https://api.apify.com/v2/actor-runs/{runId}/dataset/items
     "instanceUrl": "https://your-org.salesforce.com"
   }
 }
+```
 
-// HubSpot
+**HubSpot:**
+
+```json
 {
   "connectorType": "hubspot",
   "connectorConfig": {
     "apiKey": "YOUR_API_KEY"
   }
 }
+```
 
-// Stripe
+**Stripe:**
+
+```json
 {
   "connectorType": "stripe",
   "connectorConfig": {
     "secretKey": "sk_live_..."
   }
 }
+```
 
-// Airtable
+**Airtable:**
+
+```json
 {
   "connectorType": "airtable",
   "connectorConfig": {

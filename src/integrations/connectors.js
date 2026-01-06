@@ -70,7 +70,11 @@ class BaseConnector {
    * Validate connector configuration
    */
   validateConfig() {
-    const connectorKey = this.name.toLowerCase();
+    const connectorKey = (
+      this.connectorKey ||
+      this.name ||
+      this.constructor.name
+    ).toLowerCase();
     const connectorConfig = CONNECTOR_CONFIGS[connectorKey];
     if (!connectorConfig) {
       throw new DataQualityError(`Unknown connector: ${this.name}`, {

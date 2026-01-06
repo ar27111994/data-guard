@@ -356,9 +356,12 @@ export function detectAnomalies(history, current) {
         expectedValue: stats.mean,
         zscore: parseFloat(zscore.toFixed(2)),
         deviation: parseFloat((currentValue - stats.mean).toFixed(2)),
-        percentDeviation: parseFloat(
-          (((currentValue - stats.mean) / stats.mean) * 100).toFixed(2)
-        ),
+        percentDeviation:
+          stats.mean !== 0
+            ? parseFloat(
+                (((currentValue - stats.mean) / stats.mean) * 100).toFixed(2)
+              )
+            : 0,
         severity,
         impact,
         message: generateAnomalyMessage(
