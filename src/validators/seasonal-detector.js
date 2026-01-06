@@ -45,22 +45,40 @@ function parseDate(value) {
 
   // Try parsing string
   if (typeof value === "string") {
-    // ISO format
+    // ISO format first (handles timestamps)
     const isoDate = new Date(value);
     if (!isNaN(isoDate)) return isoDate;
 
-    // Common date formats
+    // Common date formats with capture groups
     const formats = [
-      /^(\d{4})-(\d{2})-(\d{2})/, // YYYY-MM-DD
-      /^(\d{2})\/(\d{2})\/(\d{4})/, // MM/DD/YYYY
-      /^(\d{2})-(\d{2})-(\d{4})/, // DD-MM-YYYY
+      { regex: /^(\d{4})-(\d{2})-(\d{2})/, order: ["year", "month", "day"] }, // YYYY-MM-DD
+      { regex: /^(\d{2})\/(\d{2})\/(\d{4})/, order: ["month", "day", "year"] }, // MM/DD/YYYY
+      { regex: /^(\d{2})-(\d{2})-(\d{4})/, order: ["day", "month", "year"] }, // DD-MM-YYYY
     ];
 
     for (const format of formats) {
-      const match = value.match(format);
+      const match = value.match(format.regex);
       if (match) {
-        const parsed = new Date(value);
-        if (!isNaN(parsed)) return parsed;
+        const parts = {};
+        format.order.forEach((key, idx) => {
+          parts[key] = parseInt(match[idx + 1], 10);
+        });
+
+        // Validate ranges
+        if (
+          parts.year < 1900 ||
+          parts.year > 2100 ||
+          parts.month < 1 ||
+          parts.month > 12 ||
+          parts.day < 1 ||
+          parts.day > 31
+        ) {
+          continue;
+        }
+
+        // Construct Date (month is 0-based)
+        const date = new Date(parts.year, parts.month - 1, parts.day);
+        if (!isNaN(date)) return date;
       }
     }
   }
@@ -172,7 +190,7 @@ export function analyzeDayOfWeekPattern(rows, dateColumn, valueColumn) {
     .map((d) => ({
       ...d,
       deviation: parseFloat(
-        (((d.mean - overallStats.mean) / overallStats.mean) * 100).toFixed(2),
+        (((d.mean - overallStats.mean) / overallStats.mean) * 100).toFixed(2)
       ),
     }));
 
@@ -227,7 +245,7 @@ export function analyzeMonthlyPattern(rows, dateColumn, valueColumn) {
     .map((m) => ({
       ...m,
       deviation: parseFloat(
-        (((m.mean - overallStats.mean) / overallStats.mean) * 100).toFixed(2),
+        (((m.mean - overallStats.mean) / overallStats.mean) * 100).toFixed(2)
       ),
     }));
 
@@ -282,7 +300,7 @@ export function analyzeHourlyPattern(rows, dateColumn, valueColumn) {
     .map((h) => ({
       ...h,
       deviation: parseFloat(
-        (((h.mean - overallStats.mean) / overallStats.mean) * 100).toFixed(2),
+        (((h.mean - overallStats.mean) / overallStats.mean) * 100).toFixed(2)
       ),
     }));
 
@@ -308,7 +326,7 @@ export function detectTrend(rows, dateColumn, valueColumn) {
   // Sort by date
   const sortedRows = [...rows]
     .filter(
-      (r) => parseDate(r[dateColumn]) && !isNaN(parseFloat(r[valueColumn])),
+      (r) => parseDate(r[dateColumn]) && !isNaN(parseFloat(r[valueColumn]))
     )
     .sort((a, b) => parseDate(a[dateColumn]) - parseDate(b[dateColumn]));
 
@@ -342,7 +360,7 @@ export function detectTrend(rows, dateColumn, valueColumn) {
   const predictions = indices.map((x) => intercept + slope * x);
   const ssRes = values.reduce(
     (sum, v, i) => sum + Math.pow(v - predictions[i], 2),
-    0,
+    0
   );
   const ssTot = values.reduce((sum, v) => sum + Math.pow(v - meanY, 2), 0);
   const rSquared = ssTot !== 0 ? 1 - ssRes / ssTot : 0;
@@ -382,7 +400,7 @@ export function analyzeSeasonalPatterns(
   rows,
   headers,
   columnTypes,
-  config = {},
+  config = {}
 ) {
   if (!rows || rows.length < 10) {
     return {

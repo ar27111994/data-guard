@@ -41,7 +41,9 @@ export function generateDataSourceId(config) {
     return `inline_${hashString(config.dataSourceInline.substring(0, 1000))}`;
   }
 
-  return `unknown_${Date.now()}`;
+  // Generate deterministic fallback from config hash
+  const configHash = hashString(JSON.stringify(config) || "empty");
+  return sanitizeId(`unknown_${configHash}`);
 }
 
 /**
@@ -156,10 +158,11 @@ export async function storeRunMetrics(dataSourceId, metrics) {
       history = [];
     }
 
-    // Add current metrics
+    // Add current metrics with safe Actor.getEnv() access
+    const env = Actor.getEnv() || {};
     history.push({
       ...metrics,
-      runId: Actor.getEnv().actorRunId || `local_${Date.now()}`,
+      runId: env.actorRunId || `local_${Date.now()}`,
     });
 
     // Trim to maximum entries
@@ -170,7 +173,7 @@ export async function storeRunMetrics(dataSourceId, metrics) {
     // Save updated history
     await store.setValue(key, history);
     console.log(
-      `   Stored metrics for ${dataSourceId} (${history.length} total runs)`,
+      `   Stored metrics for ${dataSourceId} (${history.length} total runs)`
     );
   } catch (error) {
     console.warn(`   Failed to store metrics: ${error.message}`);
@@ -264,7 +267,7 @@ function determineTrend(values) {
   const predictions = indices.map((x) => meanY + slope * (x - meanX));
   const ssRes = values.reduce(
     (sum, v, i) => sum + Math.pow(v - predictions[i], 2),
-    0,
+    0
   );
   const ssTot = values.reduce((sum, v) => sum + Math.pow(v - meanY, 2), 0);
   const rSquared = ssTot !== 0 ? 1 - ssRes / ssTot : 0;
@@ -359,7 +362,7 @@ export function detectAnomalies(history, current) {
         percentDeviation:
           stats.mean !== 0
             ? parseFloat(
-                (((currentValue - stats.mean) / stats.mean) * 100).toFixed(2),
+                (((currentValue - stats.mean) / stats.mean) * 100).toFixed(2)
               )
             : 0,
         severity,
@@ -368,7 +371,7 @@ export function detectAnomalies(history, current) {
           metric.name,
           currentValue,
           stats.mean,
-          impact,
+          impact
         ),
       });
     }
@@ -386,8 +389,8 @@ function generateAnomalyMessage(metricName, current, expected, impact) {
     impact === "positive"
       ? "This is a positive deviation."
       : impact === "negative"
-        ? "This may indicate a data quality issue."
-        : "Monitor this metric for consistency.";
+      ? "This may indicate a data quality issue."
+      : "Monitor this metric for consistency.";
 
   return `${metricName} is significantly ${direction} than expected (${current} vs ${expected}). ${impactText}`;
 }
@@ -473,7 +476,7 @@ export function calculateTrends(history) {
 export async function analyzeHistoricalTrends(
   dataSourceId,
   currentMetrics,
-  compareCount = 10,
+  compareCount = 10
 ) {
   console.log(`📊 Analyzing historical trends for: ${dataSourceId}`);
 
