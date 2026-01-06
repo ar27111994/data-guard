@@ -77,7 +77,7 @@ function buildSummaryCards(summary) {
       <div class="card ${invalidRows > 0 ? "error" : "success"}">
         <h3>Invalid Rows</h3>
         <div class="value">${sanitizeForHTML(
-          invalidRows.toLocaleString()
+          invalidRows.toLocaleString(),
         )}</div>
       </div>
     </div>`;
@@ -134,7 +134,7 @@ function buildColumnAnalysisTable(columnAnalysis) {
         <td>${sanitizeForHTML(col.type)}</td>
         <td>${safeNumber(col.stats?.nullPercent, 0)}%</td>
         <td>${safeNumber(col.stats?.uniqueCount, 0)}</td>
-      </tr>`
+      </tr>`,
     )
     .join("");
 
@@ -174,8 +174,8 @@ function buildIssuesTable(issues) {
         issue.severity === "error"
           ? "error"
           : issue.severity === "warning"
-          ? "warning"
-          : "info";
+            ? "warning"
+            : "info";
 
       return `
       <tr>
@@ -190,14 +190,14 @@ function buildIssuesTable(issues) {
   const truncationNote =
     issues.length > 50
       ? `<p style="margin-top: 1rem; color: var(--muted);">Showing first 50 of ${sanitizeForHTML(
-          issues.length
+          issues.length,
         )} issues</p>`
       : "";
 
   return `
     <div class="card" style="margin-bottom: 2rem;">
       <h2 style="margin-bottom: 1rem;">⚠️ Issues Found (${sanitizeForHTML(
-        issues.length
+        issues.length,
       )})</h2>
       <table>
         <thead>
@@ -349,13 +349,13 @@ export async function generateHTMLReport(qualityReport, _config) {
   } = report;
 
   const timestamp = sanitizeForHTML(
-    metadata?.validatedAt || new Date().toISOString()
+    metadata?.validatedAt || new Date().toISOString(),
   );
   // Clamp processing time to sensible range (0 to 1 hour)
   const processingTime = clamp(
     safeNumber(summaryRaw.processingTimeMs, 0),
     0,
-    MAX_PROCESSING_TIME_MS
+    MAX_PROCESSING_TIME_MS,
   );
 
   const html = `
@@ -395,7 +395,7 @@ export async function generateHTMLReport(qualityReport, _config) {
   } catch (error) {
     console.error("Failed to save QUALITY_REPORT_HTML:", error.message);
     throw new Error(
-      `Failed to save HTML report to key-value store: ${error.message}`
+      `Failed to save HTML report to key-value store: ${error.message}`,
     );
   }
 

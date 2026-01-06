@@ -12,7 +12,6 @@ All notable changes to **DataGuard** will be documented in this file.
   - Requires optional `parquetjs-lite` package
   - Full type mapping to DataGuard types
 - **Missing Value Imputation**: 7 strategies for handling missing data
-
   - `remove` - Remove rows with missing values
   - `mean` - Fill numeric columns with average
   - `median` - Fill with median value
@@ -22,7 +21,6 @@ All notable changes to **DataGuard** will be documented in this file.
   - `constant` - Fill with custom value
 
 - **Seasonal Anomaly Detection**: Time-based pattern analysis
-
   - Day-of-week pattern detection
   - Monthly seasonality analysis
   - Hourly patterns for timestamp data
@@ -37,14 +35,12 @@ All notable changes to **DataGuard** will be documented in this file.
 #### Phase 3: Integration & Ecosystem
 
 - **Third-Party Connectors**: Direct API integrations
-
   - **Salesforce**: OAuth authentication, SOQL queries
   - **HubSpot**: Contacts, Companies, Deals validation
   - **Stripe**: Charges, Customers, Invoices, Subscriptions
   - **Airtable**: Any table from any base
 
 - **Enhanced Google Sheets**: Improved integration
-
   - `googleSheetsId` - Select specific sheet by GID
   - `googleSheetsApiKey` - Access private sheets
 

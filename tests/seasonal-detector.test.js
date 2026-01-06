@@ -220,7 +220,7 @@ describe("Seasonal Anomaly Detection", () => {
       ];
 
       expect(() =>
-        analyzeDayOfWeekPattern(rows, "date", "value")
+        analyzeDayOfWeekPattern(rows, "date", "value"),
       ).not.toThrow();
     });
 

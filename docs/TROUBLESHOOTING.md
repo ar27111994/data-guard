@@ -51,7 +51,7 @@ Solutions to common issues when using the DataGuard Data Quality Checker.
    ```
 
 4. **For Apify storage:** Use the raw URL format:
-   ```
+   ```text
    https://api.apify.com/v2/key-value-stores/{storeId}/records/{key}
    ```
 
@@ -131,7 +131,7 @@ Solutions to common issues when using the DataGuard Data Quality Checker.
 
 3. **Convert to CSV** if Excel parsing continues to fail:
 
-   ```
+   ```text
    File → Save As → CSV (Comma delimited)
    ```
 
@@ -406,7 +406,7 @@ curl -X POST your-webhook-url \
 
 2. **Use correct header format:**
 
-   ```
+   ```http
    Authorization: Bearer YOUR_TOKEN
    ```
 
@@ -428,4 +428,4 @@ Check the Actor logs for detailed error messages:
 
 - **Discord**: [Apify Community](https://discord.gg/jyEM2PRvMU)
 - **GitHub**: [Open an Issue](https://github.com/ar27111994/data-guard/issues)
-- **Email**: support@apify.com
+- **Email**: [support@apify.com](mailto:support@apify.com)

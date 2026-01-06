@@ -21,7 +21,7 @@ export const IMPUTATION_STRATEGIES = {
  */
 function calculateMean(values) {
   const validValues = values.filter(
-    (v) => v !== null && v !== undefined && !isNaN(v)
+    (v) => v !== null && v !== undefined && !isNaN(v),
   );
   if (validValues.length === 0) return 0;
   return (
@@ -56,7 +56,7 @@ function calculateMedian(values) {
  */
 function calculateMode(values) {
   const validValues = values.filter(
-    (v) => v !== null && v !== undefined && v !== ""
+    (v) => v !== null && v !== undefined && v !== "",
   );
 
   if (validValues.length === 0) return null;
@@ -103,7 +103,7 @@ function detectColumnType(rows, column) {
 
   // Check if mostly numeric
   const numericCount = values.filter(
-    (v) => !isNaN(Number(v)) && v !== true && v !== false
+    (v) => !isNaN(Number(v)) && v !== true && v !== false,
   ).length;
 
   return numericCount / values.length > 0.8 ? "numeric" : "categorical";
@@ -166,7 +166,7 @@ function backwardFill(rows, column) {
 function imputeColumn(rows, column, strategy, options = {}) {
   const columnType = detectColumnType(rows, column);
   const originalMissingCount = rows.filter((row) =>
-    isMissing(row[column])
+    isMissing(row[column]),
   ).length;
 
   if (originalMissingCount === 0) {
@@ -311,7 +311,7 @@ export function imputeMissingValues(rows, headers, config = {}) {
   // Determine columns to process
   const columnsToProcess = columnsToImpute || headers;
   const filteredColumns = columnsToProcess.filter(
-    (col) => !excludeColumns.includes(col)
+    (col) => !excludeColumns.includes(col),
   );
 
   let currentRows = rows;
@@ -390,7 +390,7 @@ export function analyzeMissingValues(rows, headers) {
   // Calculate percentages
   for (const header of headers) {
     columnMissing[header].percentage = parseFloat(
-      ((columnMissing[header].count / rows.length) * 100).toFixed(2)
+      ((columnMissing[header].count / rows.length) * 100).toFixed(2),
     );
   }
 
@@ -403,7 +403,7 @@ export function analyzeMissingValues(rows, headers) {
     totalRows: rows.length,
     rowsWithMissing,
     rowsWithMissingPercentage: parseFloat(
-      ((rowsWithMissing / rows.length) * 100).toFixed(2)
+      ((rowsWithMissing / rows.length) * 100).toFixed(2),
     ),
     totalMissingValues,
     columnMissing,

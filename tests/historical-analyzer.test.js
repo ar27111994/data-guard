@@ -236,8 +236,8 @@ describe("Historical Trend Analyzer", () => {
           (a) =>
             a.severity === "critical" ||
             a.severity === "high" ||
-            a.severity === "medium"
-        )
+            a.severity === "medium",
+        ),
       ).toBe(true);
     });
 
@@ -254,7 +254,7 @@ describe("Historical Trend Analyzer", () => {
       const current = { qualityScore: 99, totalIssues: 1, totalRows: 100 };
       const anomalies = detectAnomalies(history, current);
       const positiveAnomaly = anomalies.find(
-        (a) => a.key === "qualityScore" && a.impact === "positive"
+        (a) => a.key === "qualityScore" && a.impact === "positive",
       );
       expect(positiveAnomaly).toBeDefined();
     });

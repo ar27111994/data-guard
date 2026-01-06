@@ -79,9 +79,6 @@ export async function parseParquet(buffer, config = {}) {
 
       await reader.close();
 
-      // Clean up temp file
-      await fs.unlink(tempFile).catch(() => {});
-
       return {
         rows,
         headers,

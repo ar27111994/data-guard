@@ -212,7 +212,10 @@ describe("Third-Party Connectors", () => {
         ],
       };
 
-      expect(() => connector.transformResponse(response)).not.toThrow();
+      const result = connector.transformResponse(response);
+      expect(result.rows.length).toBe(2);
+      expect(result.rows[0].id).toBe("1");
+      expect(result.rows[1].id).toBe("2");
     });
 
     test("handles deeply nested Stripe data", () => {

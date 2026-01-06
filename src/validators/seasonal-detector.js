@@ -172,7 +172,7 @@ export function analyzeDayOfWeekPattern(rows, dateColumn, valueColumn) {
     .map((d) => ({
       ...d,
       deviation: parseFloat(
-        (((d.mean - overallStats.mean) / overallStats.mean) * 100).toFixed(2)
+        (((d.mean - overallStats.mean) / overallStats.mean) * 100).toFixed(2),
       ),
     }));
 
@@ -227,7 +227,7 @@ export function analyzeMonthlyPattern(rows, dateColumn, valueColumn) {
     .map((m) => ({
       ...m,
       deviation: parseFloat(
-        (((m.mean - overallStats.mean) / overallStats.mean) * 100).toFixed(2)
+        (((m.mean - overallStats.mean) / overallStats.mean) * 100).toFixed(2),
       ),
     }));
 
@@ -282,7 +282,7 @@ export function analyzeHourlyPattern(rows, dateColumn, valueColumn) {
     .map((h) => ({
       ...h,
       deviation: parseFloat(
-        (((h.mean - overallStats.mean) / overallStats.mean) * 100).toFixed(2)
+        (((h.mean - overallStats.mean) / overallStats.mean) * 100).toFixed(2),
       ),
     }));
 
@@ -308,7 +308,7 @@ export function detectTrend(rows, dateColumn, valueColumn) {
   // Sort by date
   const sortedRows = [...rows]
     .filter(
-      (r) => parseDate(r[dateColumn]) && !isNaN(parseFloat(r[valueColumn]))
+      (r) => parseDate(r[dateColumn]) && !isNaN(parseFloat(r[valueColumn])),
     )
     .sort((a, b) => parseDate(a[dateColumn]) - parseDate(b[dateColumn]));
 
@@ -342,7 +342,7 @@ export function detectTrend(rows, dateColumn, valueColumn) {
   const predictions = indices.map((x) => intercept + slope * x);
   const ssRes = values.reduce(
     (sum, v, i) => sum + Math.pow(v - predictions[i], 2),
-    0
+    0,
   );
   const ssTot = values.reduce((sum, v) => sum + Math.pow(v - meanY, 2), 0);
   const rSquared = ssTot !== 0 ? 1 - ssRes / ssTot : 0;
@@ -382,7 +382,7 @@ export function analyzeSeasonalPatterns(
   rows,
   headers,
   columnTypes,
-  config = {}
+  config = {},
 ) {
   if (!rows || rows.length < 10) {
     return {

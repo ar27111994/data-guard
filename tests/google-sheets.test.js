@@ -33,7 +33,7 @@ describe("Google Sheets Integration", () => {
     test("rejects non-Google Sheets URLs", () => {
       expect(isGoogleSheetsUrl("https://example.com/data.csv")).toBe(false);
       expect(isGoogleSheetsUrl("https://drive.google.com/file/d/abc")).toBe(
-        false
+        false,
       );
       expect(isGoogleSheetsUrl("")).toBe(false);
     });
@@ -46,7 +46,7 @@ describe("Google Sheets Integration", () => {
       const result = parseGoogleSheetsUrl(url);
       expect(result.isGoogleSheets).toBe(true);
       expect(result.spreadsheetId).toBe(
-        "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
+        "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms",
       );
     });
 
@@ -84,7 +84,7 @@ describe("Google Sheets Integration", () => {
         "https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit";
       const exportUrl = getGoogleSheetsExportUrl(url, "csv");
       expect(exportUrl).toBe(
-        "https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/export?format=csv"
+        "https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/export?format=csv",
       );
     });
 

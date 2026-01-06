@@ -247,8 +247,22 @@ export function createLineageTracker(options = {}) {
 export function generateFlowDiagram(lineageReport) {
   const { source, transformations } = lineageReport;
 
+  /**
+   * Escape special characters in Mermaid labels
+   */
+  const escapeMermaidLabel = (label) => {
+    if (!label) return "Unknown";
+    return String(label)
+      .replace(/"/g, "'")
+      .replace(/[\[\](){}|<>]/g, "")
+      .replace(/\n/g, " ")
+      .substring(0, 50);
+  };
+
   let diagram = "graph TD\n";
-  diagram += `    source["📁 ${source.name || "Data Source"}"]\n`;
+  diagram += `    source["📁 ${escapeMermaidLabel(
+    source.name || "Data Source"
+  )}"]\n`;
 
   let previousNode = "source";
 
@@ -256,7 +270,7 @@ export function generateFlowDiagram(lineageReport) {
     const t = transformations[i];
     const nodeId = `t${i}`;
     const icon = getTransformationIcon(t.type);
-    const label = getTransformationLabel(t);
+    const label = escapeMermaidLabel(getTransformationLabel(t));
 
     diagram += `    ${nodeId}["${icon} ${label}"]\n`;
     diagram += `    ${previousNode} --> ${nodeId}\n`;

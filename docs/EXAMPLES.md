@@ -261,7 +261,7 @@ async function startValidationWithWebhook() {
           requestUrl: "https://your-app.com/webhook",
         },
       ],
-    }
+    },
   );
 
   console.log(`Started run: ${run.id}`);
@@ -375,7 +375,7 @@ import { ApifyClient } from "apify-client";
 const client = new ApifyClient({ token: "YOUR_API_TOKEN" });
 
 async function validateData(
-  input: ValidationInput
+  input: ValidationInput,
 ): Promise<ValidationResult[]> {
   const run = await client.actor("YOUR_USERNAME/dataguard").call(input);
   const { items } = await client.dataset(run.defaultDatasetId).listItems();

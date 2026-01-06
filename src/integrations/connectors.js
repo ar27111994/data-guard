@@ -118,13 +118,13 @@ class BaseConnector {
             {
               code: "API_REQUEST_FAILED",
               details: { status: res.status, error },
-            }
+            },
           );
         }
 
         return res.json();
       },
-      { maxRetries: 3, baseDelayMs: 1000 }
+      { maxRetries: 3, baseDelayMs: 1000 },
     );
 
     return response;
@@ -200,7 +200,7 @@ export class SalesforceConnector extends BaseConnector {
   async fetchData(
     objectName = "Account",
     fields = ["Id", "Name"],
-    limit = 1000
+    limit = 1000,
   ) {
     // Validate objectName to prevent SOQL injection
     if (!/^[A-Za-z0-9_]+$/.test(objectName)) {
@@ -212,14 +212,14 @@ export class SalesforceConnector extends BaseConnector {
 
     // Validate fields to prevent SOQL injection
     const sanitizedFields = fields.filter((field) =>
-      /^[A-Za-z0-9_.]+$/.test(field)
+      /^[A-Za-z0-9_.]+$/.test(field),
     );
     if (sanitizedFields.length === 0) {
       sanitizedFields.push("Id", "Name");
     }
 
     const query = `SELECT ${sanitizedFields.join(
-      ", "
+      ", ",
     )} FROM ${objectName} LIMIT ${limit}`;
     const response = await this.query(query);
 
@@ -235,7 +235,7 @@ export class SalesforceConnector extends BaseConnector {
 
     // Extract headers from first record, excluding metadata fields
     const headers = Object.keys(records[0]).filter(
-      (key) => key !== "attributes"
+      (key) => key !== "attributes",
     );
 
     const rows = records.map((record) => {
@@ -289,7 +289,7 @@ export class HubSpotConnector extends BaseConnector {
     const baseUrl = CONNECTOR_CONFIGS.hubspot.baseUrl;
     let url = `${baseUrl}/crm/v3/objects/${objectType}?limit=${Math.min(
       limit,
-      100
+      100,
     )}`;
 
     if (properties.length > 0) {
@@ -542,11 +542,11 @@ export async function fetchFromConnector(connectorType, config, options = {}) {
   const result = await connector.fetchData(
     options.objectType,
     options.properties || options.fields,
-    options.limit
+    options.limit,
   );
 
   console.log(
-    `   Fetched ${result.rows.length} records from ${connector.name}`
+    `   Fetched ${result.rows.length} records from ${connector.name}`,
   );
 
   return result;

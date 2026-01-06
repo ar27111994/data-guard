@@ -99,7 +99,7 @@ export function analyzeBenfordsLaw(rows, headers, columnTypes, config) {
     let totalDeviation = 0;
     for (let d = 1; d <= 9; d++) {
       totalDeviation += Math.abs(
-        (observedDistribution[d] ?? 0) - (BENFORD_DISTRIBUTION[d] ?? 0)
+        (observedDistribution[d] ?? 0) - (BENFORD_DISTRIBUTION[d] ?? 0),
       );
     }
     const deviationPercent = (totalDeviation / 2) * 100; // Normalize to 0-100
@@ -116,7 +116,7 @@ export function analyzeBenfordsLaw(rows, headers, columnTypes, config) {
         Object.entries(observedDistribution).map(([k, v]) => [
           k,
           parseFloat(v.toFixed(4)),
-        ])
+        ]),
       ),
       expectedDistribution: BENFORD_DISTRIBUTION,
     });
@@ -126,7 +126,7 @@ export function analyzeBenfordsLaw(rows, headers, columnTypes, config) {
         column,
         severity: deviationPercent > 30 ? "high" : "medium",
         message: `Column '${column}' deviates ${deviationPercent.toFixed(
-          1
+          1,
         )}% from Benford's Law distribution`,
         suggestion:
           "Review this data for potential manipulation, synthetic generation, or non-natural origin",

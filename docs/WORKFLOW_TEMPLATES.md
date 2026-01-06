@@ -164,14 +164,14 @@ const response = await fetch(
       detectPII: true,
       generateCleanData: true,
     }),
-  }
+  },
 );
 
 const run = await response.json();
 
 // Poll for results
 const results = await fetch(
-  `https://api.apify.com/v2/actor-runs/${run.data.id}/dataset/items`
+  `https://api.apify.com/v2/actor-runs/${run.data.id}/dataset/items`,
 );
 ```
 
@@ -466,7 +466,7 @@ app.post("/apify-webhook", async (req, res) => {
     if (score < 80) {
       await sendSlackAlert(
         process.env.SLACK_WEBHOOK,
-        `⚠️ Data Quality Alert!\nScore: ${score}/100\nIssues: ${result.issues.length}`
+        `⚠️ Data Quality Alert!\nScore: ${score}/100\nIssues: ${result.issues.length}`,
       );
     }
   }
