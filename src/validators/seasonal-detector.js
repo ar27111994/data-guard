@@ -450,7 +450,7 @@ export function analyzeSeasonalPatterns(
       type === "number" ||
       type === "integer" ||
       type === "float" ||
-      !dateColumns.includes(h)
+      (!type && !dateColumns.includes(h))
     );
   });
 

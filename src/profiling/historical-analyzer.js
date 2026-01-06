@@ -77,7 +77,7 @@ function hashString(str) {
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
     hash = (hash << 5) - hash + char;
-    hash = hash & hash; // Convert to 32-bit integer
+    hash = hash | 0; // Convert to 32-bit integer
   }
   return Math.abs(hash).toString(36);
 }
@@ -420,7 +420,12 @@ export function predictNextRun(history) {
   }
 
   const stats = calculateStats(qualityScores);
-  const predictedScore = stats.mean + trend.slope;
+  const n = qualityScores.length;
+  const meanX = (n - 1) / 2;
+  const nextIndex = n;
+
+  // Use linear regression formula: predicted = meanY + slope * (nextIndex - meanX)
+  const predictedScore = stats.mean + trend.slope * (nextIndex - meanX);
 
   // Clamp to valid range
   const clampedScore = Math.max(0, Math.min(100, predictedScore));
