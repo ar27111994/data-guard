@@ -15,7 +15,7 @@ export function generateRecommendations(
   validationResult,
   profileResult,
   qualityScore,
-  config
+  config,
 ) {
   const recommendations = [];
 

@@ -1,6 +1,6 @@
 {
   "name": "dataguard",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "DataGuard - Enterprise-grade data quality validation with anomaly detection, profiling, and auto-remediation.",
   "type": "module",
   "main": "src/main.js",
@@ -19,5 +19,8 @@
   },
   "devDependencies": {
     "jest": "^29.7.0"
+  },
+  "optionalDependencies": {
+    "parquetjs-lite": "^0.8.7"
   }
 }

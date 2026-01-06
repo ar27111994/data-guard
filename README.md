@@ -1,6 +1,21 @@
-# �️ DataGuard - Data Quality Checker & ETL Validator
+<p align="center">
+  <img src="docs/logo.png" alt="DataGuard Logo" width="120" height="120">
+</p>
 
-Enterprise-grade data quality validation for CSV, Excel, and JSON files. Detect type mismatches, duplicates, outliers, missing values, and PII—all without writing code.
+<h1 align="center">🛡️ DataGuard</h1>
+<p align="center"><strong>Data Quality Checker & ETL Validator</strong></p>
+
+<p align="center">
+  <a href="https://github.com/ar27111994/data-guard"><img src="https://img.shields.io/badge/version-1.1.0-blue.svg" alt="Version"></a>
+  <a href="https://github.com/ar27111994/data-guard/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-ISC-green.svg" alt="License"></a>
+  <img src="https://img.shields.io/badge/tests-491%20passed-brightgreen.svg" alt="Tests">
+  <img src="https://img.shields.io/coderabbit/prs/github/ar27111994/data-guard?utm_source=oss&utm_medium=github&utm_campaign=ar27111994%2Fdata-guard&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews" alt="CodeRabbit Pull Request Reviews">
+</p>
+
+<p align="center">
+Enterprise-grade data quality validation for CSV, Excel, JSON, and Parquet files.<br>
+Detect type mismatches, duplicates, outliers, missing values, and PII—all without writing code.
+</p>
 
 ## 🏆 Why This Tool?
 
@@ -85,6 +100,33 @@ Enterprise-grade data quality validation for CSV, Excel, and JSON files. Detect 
 - **Duplicate Removal**: Automatically deduplicate data
 - **Export**: Download cleaned CSV
 
+### Missing Value Imputation
+
+- **Mean/Median/Mode**: Statistical filling strategies
+- **Forward/Backward Fill**: Time-series aware filling
+- **Constant Value**: Custom default values
+
+### Advanced Analytics
+
+- **Benford's Law**: Fraud detection for financial data
+- **Correlation Analysis**: Detect relationships between columns
+- **Seasonal Detection**: Day/week/month pattern analysis
+- **Historical Trend Analysis**: Track quality over time with predictions
+
+### Data Lineage
+
+- **Transformation Tracking**: Full audit trail of all changes
+- **Flow Diagrams**: Visual representation of data pipeline
+- **Compliance Reports**: GDPR/CCPA audit support
+
+### Third-Party Integrations
+
+- **Google Sheets**: Direct validation from spreadsheets
+- **Salesforce**: Validate CRM exports
+- **HubSpot**: Check contact/company data quality
+- **Stripe**: Validate payment data
+- **Airtable**: Database validation
+
 ## 📊 Supported Formats
 
 | Format     | Extension       | Features                                   |
@@ -93,6 +135,7 @@ Enterprise-grade data quality validation for CSV, Excel, and JSON files. Detect 
 | Excel      | .xlsx, .xls     | Multi-sheet, cell formatting preservation  |
 | JSON       | .json           | Object arrays, nested structure handling   |
 | JSON Lines | .jsonl, .ndjson | Streaming support for large files          |
+| Parquet    | .parquet        | Columnar format, schema extraction         |
 
 ## 💰 Pricing (Pay-per-Event)
 

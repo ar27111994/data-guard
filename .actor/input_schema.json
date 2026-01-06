@@ -42,14 +42,15 @@
       "type": "string",
       "description": "File format to parse. Use 'auto' for automatic detection based on content/extension.",
       "default": "auto",
-      "enum": ["auto", "csv", "xlsx", "xls", "json", "jsonl"],
+      "enum": ["auto", "csv", "xlsx", "xls", "json", "jsonl", "parquet"],
       "enumTitles": [
         "Auto-detect",
         "CSV",
         "Excel (XLSX)",
         "Excel (XLS)",
         "JSON",
-        "JSON Lines"
+        "JSON Lines",
+        "Apache Parquet"
       ]
     },
     "csvDelimiter": {
@@ -86,6 +87,20 @@
       "type": "boolean",
       "description": "Whether the first row contains column names.",
       "default": true
+    },
+    "googleSheetsId": {
+      "title": "Google Sheets Tab ID",
+      "type": "string",
+      "description": "Specific sheet/tab GID to read from Google Sheets. Find this in the URL after #gid=. Leave empty for first sheet.",
+      "example": "0",
+      "editor": "textfield"
+    },
+    "googleSheetsApiKey": {
+      "title": "Google Sheets API Key",
+      "type": "string",
+      "description": "API key for accessing private Google Sheets. Get one from Google Cloud Console. Not needed for public sheets.",
+      "editor": "textfield",
+      "isSecret": true
     },
     "section_schema": {
       "title": "📐 Schema Definition",
@@ -327,6 +342,87 @@
       "type": "boolean",
       "description": "Track all validation operations for compliance auditing.",
       "default": false
+    },
+    "enableHistoricalAnalysis": {
+      "title": "Enable Historical Trend Analysis",
+      "type": "boolean",
+      "description": "Track quality metrics over time and detect trends. Stores results in Key-Value Store for comparison.",
+      "default": false
+    },
+    "historicalCompareCount": {
+      "title": "Historical Runs to Compare",
+      "type": "integer",
+      "description": "Number of previous validation runs to compare for trend analysis.",
+      "default": 10,
+      "minimum": 1,
+      "maximum": 100
+    },
+    "dataSourceIdentifier": {
+      "title": "Data Source Identifier",
+      "type": "string",
+      "description": "Unique identifier for this data source (used for historical tracking). Auto-generated from URL if not provided.",
+      "editor": "textfield"
+    },
+    "imputationStrategy": {
+      "title": "Missing Value Imputation Strategy",
+      "type": "string",
+      "description": "Strategy for handling missing values when generating cleaned data.",
+      "default": "remove",
+      "enum": [
+        "remove",
+        "mean",
+        "median",
+        "mode",
+        "forwardFill",
+        "backwardFill",
+        "constant"
+      ],
+      "enumTitles": [
+        "Remove rows with missing values",
+        "Fill with column mean (numeric)",
+        "Fill with column median (numeric)",
+        "Fill with most frequent value",
+        "Forward fill (use previous value)",
+        "Backward fill (use next value)",
+        "Fill with constant value"
+      ]
+    },
+    "imputationConstant": {
+      "title": "Imputation Constant Value",
+      "type": "string",
+      "description": "Constant value to use when imputation strategy is 'constant'.",
+      "editor": "textfield"
+    },
+    "enableSeasonalDetection": {
+      "title": "Enable Seasonal Pattern Detection",
+      "type": "boolean",
+      "description": "Detect day-of-week, monthly, and trend patterns in time-series data.",
+      "default": false
+    },
+    "enableDataLineage": {
+      "title": "Enable Data Lineage Tracking",
+      "type": "boolean",
+      "description": "Track all data transformations from source to output for audit trail.",
+      "default": false
+    },
+    "connectorType": {
+      "title": "Third-Party Connector",
+      "type": "string",
+      "description": "Fetch data from a third-party service instead of URL.",
+      "enum": ["", "salesforce", "hubspot", "stripe", "airtable"],
+      "enumTitles": [
+        "None (use URL)",
+        "Salesforce",
+        "HubSpot",
+        "Stripe",
+        "Airtable"
+      ]
+    },
+    "connectorConfig": {
+      "title": "Connector Configuration",
+      "type": "object",
+      "description": "Configuration for third-party connector (API keys, instance URLs, etc.).",
+      "editor": "json"
     }
   },
   "required": []

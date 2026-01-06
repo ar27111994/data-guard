@@ -172,15 +172,27 @@ async function parseByFormat(rawData, format, config) {
 async function fetchFromUrl(url, config) {
   // Handle Google Sheets URLs specially
   if (isGoogleSheetsUrl(url)) {
-    url = getGoogleSheetsExportUrl(url, "csv");
-    console.log(`   Converted to Google Sheets export URL`);
+    const sheetId = config.googleSheetsId || null;
+    url = getGoogleSheetsExportUrl(url, "csv", sheetId);
+    console.log(
+      `   Converted to Google Sheets export URL${
+        sheetId ? ` (sheet: ${sheetId})` : ""
+      }`,
+    );
+
+    // If API key provided, append it
+    if (config.googleSheetsApiKey) {
+      const separator = url.includes("?") ? "&" : "?";
+      url = `${url}${separator}key=${config.googleSheetsApiKey}`;
+      console.log(`   Using Google Sheets API key for authentication`);
+    }
   }
 
   const urlStr = typeof url === "string" ? url.trim() : String(url ?? "");
   console.log(
     `   Fetching from: ${urlStr.substring(0, 80)}${
       urlStr.length > 80 ? "..." : ""
-    }`
+    }`,
   );
 
   // Validate URL format
@@ -214,7 +226,7 @@ async function fetchFromUrl(url, config) {
 
         return res;
       },
-      { maxRetries: 3, baseDelayMs: 1000 }
+      { maxRetries: 3, baseDelayMs: 1000 },
     );
 
     clearTimeout(timeoutId);
@@ -340,7 +352,7 @@ function detectFormatFromBase64(buffer) {
  */
 export function assessCsvErrors(errors, dataLength) {
   const criticalErrors = errors.filter(
-    (e) => e.type === "Quotes" || e.type === "FieldMismatch"
+    (e) => e.type === "Quotes" || e.type === "FieldMismatch",
   );
   // If no data was parsed and there are critical errors, treat as fatal
   // Use Math.max(1, ...) to avoid division issues with very small datasets
@@ -410,7 +422,7 @@ async function parseCsvSafe(data, config) {
     if (result.errors.length > 0) {
       const { criticalErrors, hasFatalErrors } = assessCsvErrors(
         result.errors,
-        result.data.length
+        result.data.length,
       );
 
       if (hasFatalErrors) {
@@ -485,8 +497,10 @@ async function parseExcelSafe(data, config) {
         let value = cell.value;
         // Handle different cell types
         if (value && typeof value === "object") {
-          if (value.result !== undefined) value = value.result; // Formula
-          else if (value.text) value = value.text; // Rich text
+          if (value.result !== undefined)
+            value = value.result; // Formula
+          else if (value.text)
+            value = value.text; // Rich text
           else if (value instanceof Date) value = value.toISOString();
           else value = String(value);
         }
@@ -495,7 +509,7 @@ async function parseExcelSafe(data, config) {
 
       if (hasHeader !== false && rowNumber === 1) {
         headers = rowData.map((h, i) =>
-          h != null ? String(h) : `column_${i + 1}`
+          h != null ? String(h) : `column_${i + 1}`,
         );
         headerRowIndex = 1;
       } else {
@@ -542,7 +556,7 @@ function parseJsonSafe(data, config = {}) {
       // Validate all items are objects
       const validRows = parsed.filter(
         (item) =>
-          typeof item === "object" && item !== null && !Array.isArray(item)
+          typeof item === "object" && item !== null && !Array.isArray(item),
       );
 
       if (validRows.length === 0) {
@@ -603,8 +617,8 @@ function parseJsonLinesSafe(data, config) {
       if (parseErrors.length > lines.length * 0.5) {
         throw Errors.jsonParseError(
           new Error(
-            `Too many parse errors (${parseErrors.length}/${lines.length})`
-          )
+            `Too many parse errors (${parseErrors.length}/${lines.length})`,
+          ),
         );
       }
     }

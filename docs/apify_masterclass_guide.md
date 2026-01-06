@@ -2121,7 +2121,9 @@ Please ensure When implementing these plans:
 - [Monetization Documentation](https://docs.apify.com/platform/actors/publishing/monetize)
 - [Challenge Terms & Conditions](https://docs.apify.com/legal/challenge-terms-and-conditions)
 - [Apify Discord Community](https://discord.gg/jyEM2PRvMU)
-- @docs/
+- [Project Documentation](../docs/apify_masterclass_guide.md)
+- [Implementation Guidelines](../docs/quick_start_summary.md)
+- [Additional Resources](../.agent/rules/)
 
 Good luck! 🚀
 

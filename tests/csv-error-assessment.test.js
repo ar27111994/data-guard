@@ -16,7 +16,7 @@ describe("assessCsvErrors", () => {
     const result = assessCsvErrors(errors, 100);
     expect(result.criticalErrors).toHaveLength(2);
     expect(result.criticalErrors.map((e) => e.type)).toEqual(
-      expect.arrayContaining(["Quotes", "FieldMismatch"])
+      expect.arrayContaining(["Quotes", "FieldMismatch"]),
     );
   });
 

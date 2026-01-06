@@ -58,6 +58,9 @@ export function getGoogleSheetsExportUrl(url, format = "csv", sheetId = null) {
  * @returns {boolean}
  */
 export function isGoogleSheetsUrl(url) {
+  if (!url || typeof url !== "string") {
+    return false;
+  }
   return (
     url.includes("docs.google.com/spreadsheets") ||
     url.includes("sheets.googleapis.com")
