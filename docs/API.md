@@ -24,7 +24,7 @@ Authorization: Bearer YOUR_API_TOKEN
 
 Or as a query parameter:
 
-```
+```text
 ?token=YOUR_API_TOKEN
 ```
 
@@ -36,7 +36,7 @@ Or as a query parameter:
 
 Starts a new Actor run with the provided input.
 
-```
+```http
 POST https://api.apify.com/v2/acts/{actorId}/runs
 ```
 
@@ -78,7 +78,7 @@ POST https://api.apify.com/v2/acts/{actorId}/runs
 
 Check the status of a running or completed Actor run.
 
-```
+```http
 GET https://api.apify.com/v2/actor-runs/{runId}
 ```
 
@@ -112,7 +112,7 @@ GET https://api.apify.com/v2/actor-runs/{runId}
 
 Retrieve the output from a completed Actor run.
 
-```
+```http
 GET https://api.apify.com/v2/actor-runs/{runId}/dataset/items
 ```
 
@@ -158,13 +158,13 @@ GET https://api.apify.com/v2/actor-runs/{runId}/dataset/items
 
 ### Format Options
 
-| Field          | Type    | Default | Description                                   |
-| -------------- | ------- | ------- | --------------------------------------------- |
-| `format`       | enum    | `auto`  | `auto`, `csv`, `xlsx`, `xls`, `json`, `jsonl` |
-| `csvDelimiter` | enum    | `auto`  | `auto`, `,`, `;`, `\t`, `\|`                  |
-| `encoding`     | enum    | `utf-8` | `utf-8`, `latin1`, `utf-16`, `ascii`          |
-| `excelSheet`   | string  | -       | Sheet name or index                           |
-| `hasHeader`    | boolean | `true`  | First row contains headers                    |
+| Field          | Type    | Default | Description                                              |
+| -------------- | ------- | ------- | -------------------------------------------------------- |
+| `format`       | enum    | `auto`  | `auto`, `csv`, `xlsx`, `xls`, `json`, `jsonl`, `parquet` |
+| `csvDelimiter` | enum    | `auto`  | `auto`, `,`, `;`, `\t`, `\|`                             |
+| `encoding`     | enum    | `utf-8` | `utf-8`, `latin1`, `utf-16`, `ascii`                     |
+| `excelSheet`   | string  | -       | Sheet name or index                                      |
+| `hasHeader`    | boolean | `true`  | First row contains headers                               |
 
 ### Validation Options
 
@@ -357,7 +357,7 @@ The Apify platform enforces rate limits based on your subscription plan.
 
 **Rate Limit Headers:**
 
-```
+```text
 X-RateLimit-Limit: 120
 X-RateLimit-Remaining: 118
 X-RateLimit-Reset: 1705312800

@@ -42,8 +42,10 @@ export async function parseParquet(buffer, config = {}) {
     } catch {
       throw new DataQualityError(
         "Parquet parsing requires the parquetjs-lite or parquetjs package. Install with: npm install parquetjs-lite",
-        "PARQUET_PACKAGE_MISSING",
-        { suggestion: "npm install parquetjs-lite" }
+        {
+          code: "PARQUET_PACKAGE_MISSING",
+          suggestion: "npm install parquetjs-lite",
+        }
       );
     }
   }
@@ -100,8 +102,10 @@ export async function parseParquet(buffer, config = {}) {
 
     throw new DataQualityError(
       `Failed to parse Parquet file: ${error.message}`,
-      "PARQUET_PARSE_ERROR",
-      { originalError: error.message }
+      {
+        code: "PARQUET_PARSE_ERROR",
+        details: { originalError: error },
+      }
     );
   }
 }
@@ -167,10 +171,9 @@ export async function getParquetMetadata(buffer) {
   // Full metadata requires parsing with parquetjs
 
   if (!isParquetData(buffer)) {
-    throw new DataQualityError(
-      "Not a valid Parquet file",
-      "INVALID_PARQUET_FILE"
-    );
+    throw new DataQualityError("Not a valid Parquet file", {
+      code: "INVALID_PARQUET_FILE",
+    });
   }
 
   return {
@@ -239,7 +242,7 @@ export async function writeParquet(rows, headers, options = {}) {
     } catch {
       throw new DataQualityError(
         "Parquet writing requires the parquetjs-lite or parquetjs package",
-        "PARQUET_PACKAGE_MISSING"
+        { code: "PARQUET_PACKAGE_MISSING" }
       );
     }
   }

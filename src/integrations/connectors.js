@@ -70,22 +70,21 @@ class BaseConnector {
    * Validate connector configuration
    */
   validateConfig() {
-    const connectorConfig = CONNECTOR_CONFIGS[this.name.toLowerCase()];
+    const connectorKey = this.name.toLowerCase();
+    const connectorConfig = CONNECTOR_CONFIGS[connectorKey];
     if (!connectorConfig) {
-      throw new DataQualityError(
-        `Unknown connector: ${this.name}`,
-        "UNKNOWN_CONNECTOR",
-        { availableConnectors: Object.keys(CONNECTOR_CONFIGS) }
-      );
+      throw new DataQualityError(`Unknown connector: ${this.name}`, {
+        code: "UNKNOWN_CONNECTOR",
+        details: { availableConnectors: Object.keys(CONNECTOR_CONFIGS) },
+      });
     }
 
     for (const field of connectorConfig.requiredFields || []) {
       if (!this.config[field]) {
-        throw new DataQualityError(
-          `Missing required field: ${field}`,
-          "MISSING_CONFIG_FIELD",
-          { connector: this.name, field }
-        );
+        throw new DataQualityError(`Missing required field: ${field}`, {
+          code: "MISSING_CONFIG_FIELD",
+          details: { connector: this.name, field },
+        });
       }
     }
   }
@@ -112,8 +111,10 @@ class BaseConnector {
           const error = await res.json().catch(() => ({}));
           throw new DataQualityError(
             `API request failed: ${res.status} ${res.statusText}`,
-            "API_REQUEST_FAILED",
-            { status: res.status, error }
+            {
+              code: "API_REQUEST_FAILED",
+              details: { status: res.status, error },
+            }
           );
         }
 
@@ -197,7 +198,23 @@ export class SalesforceConnector extends BaseConnector {
     fields = ["Id", "Name"],
     limit = 1000
   ) {
-    const query = `SELECT ${fields.join(
+    // Validate objectName to prevent SOQL injection
+    if (!/^[A-Za-z0-9_]+$/.test(objectName)) {
+      throw new DataQualityError(`Invalid object name: ${objectName}`, {
+        code: "INVALID_OBJECT_NAME",
+        details: { objectName },
+      });
+    }
+
+    // Validate fields to prevent SOQL injection
+    const sanitizedFields = fields.filter((field) =>
+      /^[A-Za-z0-9_.]+$/.test(field)
+    );
+    if (sanitizedFields.length === 0) {
+      sanitizedFields.push("Id", "Name");
+    }
+
+    const query = `SELECT ${sanitizedFields.join(
       ", "
     )} FROM ${objectName} LIMIT ${limit}`;
     const response = await this.query(query);
@@ -339,10 +356,8 @@ export class StripeConnector extends BaseConnector {
   }
 
   getAuthHeaders() {
-    const credentials = Buffer.from(`${this.config.secretKey}:`).toString(
-      "base64"
-    );
-    return { Authorization: `Basic ${credentials}` };
+    // Stripe uses Bearer token authentication
+    return { Authorization: `Bearer ${this.config.secretKey}` };
   }
 
   /**
@@ -499,11 +514,10 @@ export function createConnector(type, config) {
 
   const ConnectorClass = connectors[type.toLowerCase()];
   if (!ConnectorClass) {
-    throw new DataQualityError(
-      `Unknown connector type: ${type}`,
-      "UNKNOWN_CONNECTOR",
-      { availableConnectors: Object.keys(connectors) }
-    );
+    throw new DataQualityError(`Unknown connector type: ${type}`, {
+      code: "UNKNOWN_CONNECTOR",
+      details: { availableConnectors: Object.keys(connectors) },
+    });
   }
 
   return new ConnectorClass(config);

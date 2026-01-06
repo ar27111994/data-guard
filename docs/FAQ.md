@@ -126,7 +126,7 @@ Yes! Apify offers:
 
 Use this formula:
 
-```
+```text
 Cost = $0.00005 + (Number of Rows × $0.001)
 ```
 

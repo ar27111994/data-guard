@@ -50,12 +50,19 @@ export function generateDataSourceId(config) {
  * @returns {string} Sanitized identifier
  */
 function sanitizeId(id) {
-  return id
+  const sanitized = id
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "_")
     .replace(/_+/g, "_")
     .replace(/^_|_$/g, "")
     .substring(0, 100);
+
+  // Return fallback if sanitized result is empty
+  if (!sanitized) {
+    return `id_${hashString(id || "unknown")}`;
+  }
+
+  return sanitized;
 }
 
 /**

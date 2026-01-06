@@ -51,7 +51,7 @@ All notable changes to **DataGuard** will be documented in this file.
 - **Historical Trend Analysis**: ML-inspired quality tracking
   - Store metrics in Key-Value Store
   - Calculate trends (improving/declining/stable)
-  - Z-score based anomaly detection
+  - Z-score-based anomaly detection
   - Predict next run quality score
   - Generate actionable recommendations
 
