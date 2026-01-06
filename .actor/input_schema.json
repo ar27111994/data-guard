@@ -221,20 +221,23 @@
       "description": "Automatic fixes to apply when generating cleaned data.",
       "default": ["trim", "removeEmpty"],
       "editor": "select",
-      "enum": [
-        "trim",
-        "lowercase",
-        "uppercase",
-        "removeEmpty",
-        "removeDuplicates"
-      ],
-      "enumTitles": [
-        "Trim Whitespace",
-        "Convert to Lowercase",
-        "Convert to Uppercase",
-        "Remove Empty Rows",
-        "Remove Duplicate Rows"
-      ]
+      "items": {
+        "type": "string",
+        "enum": [
+          "trim",
+          "lowercase",
+          "uppercase",
+          "removeEmpty",
+          "removeDuplicates"
+        ],
+        "enumTitles": [
+          "Trim Whitespace",
+          "Convert to Lowercase",
+          "Convert to Uppercase",
+          "Remove Empty Rows",
+          "Remove Duplicate Rows"
+        ]
+      }
     },
     "sampleSize": {
       "title": "Sample Size",
@@ -271,14 +274,17 @@
       "description": "Types of PII to scan for.",
       "default": ["email", "phone", "ssn", "creditCard"],
       "editor": "select",
-      "enum": ["email", "phone", "ssn", "creditCard", "ipAddress"],
-      "enumTitles": [
-        "Email Addresses",
-        "Phone Numbers",
-        "SSN Patterns",
-        "Credit Card Numbers",
-        "IP Addresses"
-      ]
+      "items": {
+        "type": "string",
+        "enum": ["email", "phone", "ssn", "creditCard", "ipAddress"],
+        "enumTitles": [
+          "Email Addresses",
+          "Phone Numbers",
+          "SSN Patterns",
+          "Credit Card Numbers",
+          "IP Addresses"
+        ]
+      }
     },
     "section_advanced": {
       "title": "🔬 Advanced Analytics",
