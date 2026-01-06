@@ -1,6 +1,21 @@
-# �️ DataGuard - Data Quality Checker & ETL Validator
+<p align="center">
+  <img src="docs/logo.png" alt="DataGuard Logo" width="120" height="120">
+</p>
 
-Enterprise-grade data quality validation for CSV, Excel, and JSON files. Detect type mismatches, duplicates, outliers, missing values, and PII—all without writing code.
+<h1 align="center">🛡️ DataGuard</h1>
+<p align="center"><strong>Data Quality Checker & ETL Validator</strong></p>
+
+<p align="center">
+  <a href="https://github.com/ar27111994/data-guard"><img src="https://img.shields.io/badge/version-1.1.0-blue.svg" alt="Version"></a>
+  <a href="https://github.com/ar27111994/data-guard/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-ISC-green.svg" alt="License"></a>
+  <img src="https://img.shields.io/badge/tests-491%20passed-brightgreen.svg" alt="Tests">
+  <img src="https://img.shields.io/coderabbit/prs/github/ar27111994/data-guard?utm_source=oss&utm_medium=github&utm_campaign=ar27111994%2Fdata-guard&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews" alt="CodeRabbit Pull Request Reviews">
+</p>
+
+<p align="center">
+Enterprise-grade data quality validation for CSV, Excel, JSON, and Parquet files.<br>
+Detect type mismatches, duplicates, outliers, missing values, and PII—all without writing code.
+</p>
 
 ## 🏆 Why This Tool?
 

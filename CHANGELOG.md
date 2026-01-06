@@ -2,6 +2,85 @@
 
 All notable changes to **DataGuard** will be documented in this file.
 
+## [1.1.0] - 2026-01-06
+
+### Added
+
+#### Phase 2: Premium Features
+
+- **Parquet File Support**: Parse Apache Parquet files with schema extraction
+  - Requires optional `parquetjs-lite` package
+  - Full type mapping to DataGuard types
+- **Missing Value Imputation**: 7 strategies for handling missing data
+
+  - `remove` - Remove rows with missing values
+  - `mean` - Fill numeric columns with average
+  - `median` - Fill with median value
+  - `mode` - Fill with most frequent value
+  - `forwardFill` - Use previous row's value (time-series)
+  - `backwardFill` - Use next row's value
+  - `constant` - Fill with custom value
+
+- **Seasonal Anomaly Detection**: Time-based pattern analysis
+
+  - Day-of-week pattern detection
+  - Monthly seasonality analysis
+  - Hourly patterns for timestamp data
+  - Linear regression trend detection
+
+- **Data Lineage Tracking**: Full transformation audit trail
+  - Records all data transformations
+  - Column-level change tracking
+  - Mermaid flow diagram generation
+  - Key-Value Store persistence
+
+#### Phase 3: Integration & Ecosystem
+
+- **Third-Party Connectors**: Direct API integrations
+
+  - **Salesforce**: OAuth authentication, SOQL queries
+  - **HubSpot**: Contacts, Companies, Deals validation
+  - **Stripe**: Charges, Customers, Invoices, Subscriptions
+  - **Airtable**: Any table from any base
+
+- **Enhanced Google Sheets**: Improved integration
+
+  - `googleSheetsId` - Select specific sheet by GID
+  - `googleSheetsApiKey` - Access private sheets
+
+- **Historical Trend Analysis**: ML-inspired quality tracking
+  - Store metrics in Key-Value Store
+  - Calculate trends (improving/declining/stable)
+  - Z-score based anomaly detection
+  - Predict next run quality score
+  - Generate actionable recommendations
+
+### Changed
+
+- Updated input schema with 8 new configuration options
+- Added `parquet` to format enum
+- Enhanced error handling for all new modules
+
+### Documentation
+
+- Updated README.md with all new features
+- Added 80+ lines to API.md with new parameters
+- Added 50+ lines to FAQ.md with new Q&A entries
+- Updated supported formats table with Parquet
+
+### Testing
+
+- **491 tests** across 26 test suites (up from 334)
+- New test files:
+  - `imputation.test.js` (20+ tests)
+  - `seasonal-detector.test.js` (25+ tests)
+  - `data-lineage.test.js` (20+ tests)
+  - `connectors.test.js` (25+ tests)
+  - `historical-analyzer.test.js` (39 tests)
+  - `google-sheets.test.js` (26 tests)
+
+---
+
 ## [1.0.0] - 2026-01-05
 
 ### Added
@@ -61,6 +140,8 @@ All notable changes to **DataGuard** will be documented in this file.
 
 - **334 tests** across 18 test suites
 - Coverage: type validation, parsing, duplicates, outliers, PII, errors, scoring, analytics
+
+---
 
 ## [0.1.0] - 2025-12-XX
 
