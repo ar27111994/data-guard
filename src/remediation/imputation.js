@@ -59,7 +59,8 @@ function calculateMode(values) {
     (v) => v !== null && v !== undefined && v !== ""
   );
 
-  if (validValues.length === 0) return null;
+  // Return undefined for consistency with mean/median when no valid values
+  if (validValues.length === 0) return undefined;
 
   const frequency = new Map();
   let maxFreq = 0;
@@ -225,6 +226,21 @@ function imputeColumn(rows, column, strategy, options = {}) {
 
     case IMPUTATION_STRATEGIES.MODE:
       imputeValue = calculateMode(values);
+      // Skip imputation if no valid mode exists
+      if (imputeValue === undefined) {
+        return {
+          rows,
+          stats: {
+            column,
+            strategy: "none",
+            columnType,
+            missingCount: originalMissingCount,
+            imputedCount: 0,
+            rowsRemoved: 0,
+            imputeValue: null,
+          },
+        };
+      }
       imputedRows = rows.map((row) => ({
         ...row,
         [column]: isMissing(row[column]) ? imputeValue : row[column],

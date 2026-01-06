@@ -189,9 +189,15 @@ export function analyzeDayOfWeekPattern(rows, dateColumn, valueColumn) {
     })
     .map((d) => ({
       ...d,
-      deviation: parseFloat(
-        (((d.mean - overallStats.mean) / overallStats.mean) * 100).toFixed(2)
-      ),
+      deviation:
+        overallStats.mean !== 0
+          ? parseFloat(
+              (
+                ((d.mean - overallStats.mean) / overallStats.mean) *
+                100
+              ).toFixed(2)
+            )
+          : 0,
     }));
 
   return {
@@ -244,9 +250,15 @@ export function analyzeMonthlyPattern(rows, dateColumn, valueColumn) {
     })
     .map((m) => ({
       ...m,
-      deviation: parseFloat(
-        (((m.mean - overallStats.mean) / overallStats.mean) * 100).toFixed(2)
-      ),
+      deviation:
+        overallStats.mean !== 0
+          ? parseFloat(
+              (
+                ((m.mean - overallStats.mean) / overallStats.mean) *
+                100
+              ).toFixed(2)
+            )
+          : 0,
     }));
 
   return {
@@ -299,9 +311,15 @@ export function analyzeHourlyPattern(rows, dateColumn, valueColumn) {
     })
     .map((h) => ({
       ...h,
-      deviation: parseFloat(
-        (((h.mean - overallStats.mean) / overallStats.mean) * 100).toFixed(2)
-      ),
+      deviation:
+        overallStats.mean !== 0
+          ? parseFloat(
+              (
+                ((h.mean - overallStats.mean) / overallStats.mean) *
+                100
+              ).toFixed(2)
+            )
+          : 0,
     }));
 
   return {
