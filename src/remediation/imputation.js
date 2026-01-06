@@ -341,6 +341,7 @@ export function imputeMissingValues(rows, headers, config = {}) {
   const columnStats = [];
   let totalMissing = 0;
   let totalImputed = 0;
+  let totalRowsRemoved = 0;
 
   // Process each column
   for (const column of filteredColumns) {
@@ -352,6 +353,7 @@ export function imputeMissingValues(rows, headers, config = {}) {
     columnStats.push(result.stats);
     totalMissing += result.stats.missingCount;
     totalImputed += result.stats.imputedCount;
+    totalRowsRemoved += result.stats.rowsRemoved || 0;
   }
 
   return {
@@ -360,6 +362,7 @@ export function imputeMissingValues(rows, headers, config = {}) {
       strategy: imputationStrategy,
       totalMissing,
       totalImputed,
+      totalRowsRemoved,
       columnsProcessed: filteredColumns.length,
       columnStats: columnStats.filter((s) => s.missingCount > 0),
     },

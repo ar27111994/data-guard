@@ -439,6 +439,7 @@ export function analyzeSeasonalPatterns(
   }
 
   // Find numeric columns for value analysis
+  // Stage 1: Include explicitly-typed numeric columns, or all non-date columns if type info unavailable
   const numericColumns = headers.filter((h) => {
     const type = columnTypes?.[h]?.type;
     return (

@@ -293,6 +293,32 @@ function determineTrend(values) {
 }
 
 /**
+ * Classify anomaly severity based on z-score
+ * @param {number} zscore - Z-score value
+ * @returns {string} Severity level
+ */
+function classifySeverity(zscore) {
+  const absZscore = Math.abs(zscore);
+  if (absZscore >= 4) return "critical";
+  if (absZscore >= 3) return "high";
+  return "medium";
+}
+
+/**
+ * Determine impact of anomaly (positive/negative/neutral)
+ * @param {boolean|null} higherBetter - Whether higher values are better
+ * @param {number} zscore - Z-score value
+ * @returns {string} Impact assessment
+ */
+function determineImpact(higherBetter, zscore) {
+  if (higherBetter === null) return "neutral";
+  if ((higherBetter && zscore > 0) || (!higherBetter && zscore < 0)) {
+    return "positive";
+  }
+  return "negative";
+}
+
+/**
  * Detect anomalies in current metrics compared to history
  * @param {Array} history - Historical metrics
  * @param {Object} current - Current metrics
@@ -330,27 +356,8 @@ export function detectAnomalies(history, current) {
 
     // Check if anomalous
     if (Math.abs(zscore) >= ANOMALY_ZSCORE_THRESHOLD) {
-      let severity;
-      if (Math.abs(zscore) >= 4) {
-        severity = "critical";
-      } else if (Math.abs(zscore) >= 3) {
-        severity = "high";
-      } else {
-        severity = "medium";
-      }
-
-      // Determine if this is good or bad
-      let impact;
-      if (metric.higherBetter === null) {
-        impact = "neutral";
-      } else if (
-        (metric.higherBetter && zscore > 0) ||
-        (!metric.higherBetter && zscore < 0)
-      ) {
-        impact = "positive";
-      } else {
-        impact = "negative";
-      }
+      const severity = classifySeverity(zscore);
+      const impact = determineImpact(metric.higherBetter, zscore);
 
       anomalies.push({
         metric: metric.name,
