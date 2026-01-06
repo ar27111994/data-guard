@@ -7,6 +7,7 @@
     "section_source": {
       "title": "📁 Data Source",
       "type": "string",
+      "description": "Input data configuration section.",
       "sectionCaption": "Input Data",
       "sectionDescription": "Provide the data to validate via URL, inline text, or base64 encoding.",
       "editor": "hidden"
@@ -33,6 +34,7 @@
     "section_format": {
       "title": "📊 Format Options",
       "type": "string",
+      "description": "Parsing configuration section.",
       "sectionCaption": "Parsing Configuration",
       "sectionDescription": "Configure how the input file should be parsed.",
       "editor": "hidden"
@@ -105,6 +107,7 @@
     "section_schema": {
       "title": "📐 Schema Definition",
       "type": "string",
+      "description": "Column validation rules section.",
       "sectionCaption": "Column Validation Rules",
       "sectionDescription": "Define expected column types and constraints. Leave empty for auto-detection.",
       "editor": "hidden"
@@ -141,6 +144,7 @@
     "section_validation": {
       "title": "🔍 Validation Rules",
       "type": "string",
+      "description": "Quality checks configuration section.",
       "sectionCaption": "Quality Checks",
       "sectionDescription": "Configure which validation checks to perform.",
       "editor": "hidden"
@@ -200,6 +204,7 @@
     "section_output": {
       "title": "📤 Output Options",
       "type": "string",
+      "description": "Results and export configuration section.",
       "sectionCaption": "Results & Export",
       "sectionDescription": "Configure output format and what to include in results.",
       "editor": "hidden"
@@ -249,6 +254,7 @@
     "section_compliance": {
       "title": "🔒 Compliance & Security",
       "type": "string",
+      "description": "PII detection configuration section.",
       "sectionCaption": "PII Detection",
       "sectionDescription": "Detect sensitive data for GDPR/CCPA compliance.",
       "editor": "hidden"
@@ -277,6 +283,7 @@
     "section_advanced": {
       "title": "🔬 Advanced Analytics",
       "type": "string",
+      "description": "Premium features configuration section.",
       "sectionCaption": "Premium Features",
       "sectionDescription": "Enable advanced data quality analysis features.",
       "editor": "hidden"
