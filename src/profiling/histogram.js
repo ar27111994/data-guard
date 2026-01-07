@@ -179,9 +179,3 @@ function getCardinalityRecommendation(type) {
   };
   return recommendations[type] || "";
 }
-
-export {
-  generateNumericHistogram,
-  generateCategoricalDistribution,
-  analyzeCardinality,
-};
