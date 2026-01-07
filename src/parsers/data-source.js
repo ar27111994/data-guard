@@ -419,6 +419,11 @@ function extractCsvHeaders(result, config) {
 async function parseCsvSafe(data, config) {
   const { csvDelimiter, hasHeader, encoding } = config;
 
+  // Convert Buffer to string if needed (for base64 sources)
+  const textData = Buffer.isBuffer(data)
+    ? data.toString(encoding || "utf-8")
+    : data;
+
   try {
     const parseConfig = {
       header: hasHeader !== false,
@@ -431,7 +436,7 @@ async function parseCsvSafe(data, config) {
       parseConfig.delimiter = csvDelimiter;
     }
 
-    const result = Papa.parse(data, parseConfig);
+    const result = Papa.parse(textData, parseConfig);
 
     // Assess errors using helper
     if (result.errors.length > 0) {
@@ -559,7 +564,10 @@ async function parseExcelSafe(data, config) {
  */
 function parseJsonSafe(data, config = {}) {
   try {
-    const parsed = typeof data === "string" ? JSON.parse(data) : data;
+    // Convert Buffer to string if needed (for base64 sources)
+    const textData = Buffer.isBuffer(data) ? data.toString("utf-8") : data;
+    const parsed =
+      typeof textData === "string" ? JSON.parse(textData) : textData;
 
     if (Array.isArray(parsed)) {
       if (parsed.length === 0) {
