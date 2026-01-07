@@ -149,8 +149,8 @@ function calculateGroupStats(values) {
     mean: parseFloat(mean.toFixed(4)),
     stdDev: parseFloat(stdDev.toFixed(4)),
     count: n,
-    min: Math.min(...validValues),
-    max: Math.max(...validValues),
+    min: validValues.reduce((a, b) => Math.min(a, b), Infinity),
+    max: validValues.reduce((a, b) => Math.max(a, b), -Infinity),
   };
 }
 

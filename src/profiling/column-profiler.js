@@ -119,13 +119,22 @@ function calculateStringStats(values) {
     return { minLength: 0, maxLength: 0, avgLength: 0 };
   }
 
-  const lengths = values.map((v) => String(v).length);
-  const minLength = Math.min(...lengths);
-  const maxLength = Math.max(...lengths);
-  const avgLength = lengths.reduce((a, b) => a + b, 0) / lengths.length;
+  // Use reduce instead of spread to avoid stack overflow on large arrays
+  let minLength = Infinity;
+  let maxLength = 0;
+  let totalLength = 0;
+
+  for (const v of values) {
+    const len = String(v).length;
+    if (len < minLength) minLength = len;
+    if (len > maxLength) maxLength = len;
+    totalLength += len;
+  }
+
+  const avgLength = totalLength / values.length;
 
   return {
-    minLength,
+    minLength: minLength === Infinity ? 0 : minLength,
     maxLength,
     avgLength: parseFloat(avgLength.toFixed(2)),
   };

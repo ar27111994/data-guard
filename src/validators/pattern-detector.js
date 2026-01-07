@@ -223,7 +223,7 @@ function detectFrequencyAnomalies(values, column) {
   }
 
   // Check for extreme concentration (one value dominates)
-  const maxFrequency = Math.max(...frequencies);
+  const maxFrequency = frequencies.reduce((a, b) => Math.max(a, b), 0);
   const dominationRatio = maxFrequency / values.length;
   if (dominationRatio > 0.9 && uniqueCount > 1) {
     return {
@@ -231,7 +231,7 @@ function detectFrequencyAnomalies(values, column) {
       type: "concentrated-distribution",
       confidence: dominationRatio,
       message: `One value accounts for ${(dominationRatio * 100).toFixed(
-        0,
+        0
       )}% of all values`,
       suggestion: "Consider if this column provides meaningful variance",
     };
